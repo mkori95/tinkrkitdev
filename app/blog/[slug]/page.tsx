@@ -183,12 +183,16 @@ export default async function BlogPostPage({
   // Check DB first so migrated and user-submitted posts are always served
   // from the canonical DB record. MDX files stay as a fallback for local dev
   // or if Supabase is unavailable.
-  const { data: dbPost } = await supabase
+  const { data: dbPost, error: dbError } = await supabase
     .from("blog_posts")
     .select("*")
     .eq("slug", params.slug)
     .eq("status", "approved")
-    .single<DBPost>();
+    .maybeSingle<DBPost>(); // maybeSingle doesn't throw when 0 rows; single() does
+
+  if (dbError) {
+    console.error(`[blog/${params.slug}] Supabase error:`, dbError.message, dbError.code);
+  }
 
   if (dbPost) {
     const toolObj = TOOLS.find(

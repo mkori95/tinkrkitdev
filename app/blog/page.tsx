@@ -28,11 +28,27 @@ export default async function BlogPage() {
   }));
 
   // ── Supabase approved posts ──────────────────────────────────────────────
-  const { data: dbRows } = await supabase
+  // nullsFirst: false → posts with null published_at sort LAST (fall through
+  // to the created_at fallback below), preventing them from being buried or
+  // accidentally deduplicated before their MDX twin.
+  const { data: dbRows, error: dbError } = await supabase
     .from("blog_posts")
     .select("slug, title, description, tags, author_name, published_at, created_at")
     .eq("status", "approved")
-    .order("published_at", { ascending: false });
+    .order("published_at", { ascending: false, nullsFirst: false })
+    .order("created_at",   { ascending: false });
+
+  if (dbError) {
+    // Visible in `npm run dev` terminal — helps diagnose RLS / credential issues.
+    console.error(
+      "[blog/page] Supabase fetch failed — only MDX posts will be shown.\n",
+      "  code:",    dbError.code,
+      "\n  message:", dbError.message,
+      "\n  hint:",    dbError.hint,
+      "\n  details:", dbError.details,
+      "\nVisit /api/debug/supabase for full diagnostics."
+    );
+  }
 
   const dbPosts: UnifiedPost[] = (dbRows ?? []).map((p) => ({
     slug:        p.slug,
@@ -40,11 +56,14 @@ export default async function BlogPage() {
     description: p.description ?? "",
     tags:        p.tags ?? [],
     author:      p.author_name,
+    // Use published_at when available; fall back to created_at
     date:        p.published_at ?? p.created_at,
     source:      "db",
   }));
 
-  // ── Merge + sort newest first, dedup by slug ──────────────────────────
+  // ── Merge + sort newest first, dedup by slug ──────────────────────────────
+  // DB posts precede MDX posts in the input array, so when two entries share
+  // the same timestamp (e.g. migrated posts), DB wins the dedup race.
   const seenSlugs = new Set<string>();
   const allPosts: UnifiedPost[] = [...dbPosts, ...mdxPosts]
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
