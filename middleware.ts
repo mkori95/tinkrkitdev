@@ -1,5 +1,7 @@
-// middleware.ts — runs in Edge Runtime
-// Protects all /admin/* routes. Uses next-auth JWT to verify identity.
+// middleware.ts — Edge Runtime
+// Double-layer protection for /admin routes:
+//   1. Middleware (this file) — fast redirect at the edge, any domain
+//   2. Server-side getServerSession in each page.tsx — fallback if edge cookie differs
 
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
@@ -8,13 +10,18 @@ import { getToken } from "next-auth/jwt";
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
-  // Only guard /admin/* paths
-  if (!pathname.startsWith("/admin")) return NextResponse.next();
+  const token = await getToken({
+    req,
+    secret: process.env.NEXTAUTH_SECRET,
+    // Explicit cookie names cover both HTTP (dev) and HTTPS (prod/custom domain)
+    cookieName: req.headers.get("x-forwarded-proto") === "https"
+      ? "__Secure-next-auth.session-token"
+      : "next-auth.session-token",
+  });
 
-  const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
   const isAdmin = token?.email === process.env.ADMIN_EMAIL;
 
-  // /admin/login is publicly accessible (but redirect away if already logged in)
+  // /admin/login — public, but bounce already-authenticated admins away
   if (pathname === "/admin/login") {
     if (isAdmin) {
       return NextResponse.redirect(new URL("/admin/blog", req.url));
@@ -22,15 +29,15 @@ export async function middleware(req: NextRequest) {
     return NextResponse.next();
   }
 
-  // All other /admin/* routes require the admin session
+  // /admin (root) and all /admin/* routes — require admin session
   if (!isAdmin) {
-    const loginUrl = new URL("/admin/login", req.url);
-    return NextResponse.redirect(loginUrl);
+    return NextResponse.redirect(new URL("/admin/login", req.url));
   }
 
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/admin/:path*"],
+  // Matches /admin exactly AND /admin/anything — both were needed
+  matcher: ["/admin", "/admin/:path*"],
 };

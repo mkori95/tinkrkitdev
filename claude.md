@@ -2,21 +2,24 @@
 
 ## What This Is
 Free, beautiful, browser-based universal toolkit website.
-No backend. No auth. No database. Everything client-side.
+No backend for tools. No auth for users. Everything client-side.
 Think iLovePDF but for everything — dev tools, image tools, PDF tools, file converters.
+Blog system + admin panel backed by Supabase + Google OAuth.
 
 ## Stack
 - Next.js 14 (App Router)
 - Tailwind CSS
 - shadcn/ui components (v3-compatible, hand-written — NOT shadcn v4)
-- Browser-side JS libraries only
+- Browser-side JS libraries only (for tools)
+- Supabase (blog posts DB)
+- NextAuth v4 (Google OAuth, admin only)
+- Resend (rejection emails)
 - Vercel deployment (pending)
 
 ## Architecture Rules
-- ZERO backend — all logic runs in the browser
-- ZERO API calls for tools — use JS libraries only
+- ZERO backend for tools — all tool logic runs in the browser
 - Each tool = its own page and URL
-- Privacy first — no user data stored anywhere
+- Privacy first — no user data stored except blog submissions
 - Reuse ToolLayout, InputArea, HighlightedOutput, Logo components on every tool/page
 - NEVER return a 404 — every linked URL gets at minimum a ComingSoon page
 
@@ -32,50 +35,53 @@ Think iLovePDF but for everything — dev tools, image tools, PDF tools, file co
 - [x] Custom ThemeProvider (`components/ThemeProvider.tsx`) — exports `useTheme()` → `{ theme, toggle }`
 - [x] `contexts/LayoutContext.tsx` — Side Layout + Favorites (localStorage-persisted)
 - [x] `lib/tools-config.ts` — all 64 tools' metadata (TOOLS array + helpers)
-- [x] `lib/blog.ts` + `lib/blog-data.ts` — MDX blog system (server + client-safe)
-- [x] `lib/supabase.ts` — Supabase client; `supabase` (anon key, browser-safe) + `createAdminSupabase()` (service role, server-only); `DBPost` + `UnifiedPost` types
-- [x] `lib/auth-options.ts` — NextAuth config; Google provider only; `signIn` callback blocks non-ADMIN_EMAIL; JWT session strategy
-- [x] `robots.txt`
-- [x] `public/tinkrkit-icon.png` — favicon (referenced in app/layout.tsx metadata only)
-- [x] `public/tinkrkit-og.png` — Open Graph image (referenced in app/layout.tsx metadata only)
-
-### Components
-- [x] `Logo.tsx` — **Single source of truth for rendered logo.** Pure JSX, no image files.
-  - `<Logo size="md" />` in Navbar, `<Logo size="sm" />` in Footer
-  - Indigo `rounded-lg` box + inline SVG wrench (white stroke) + `text-foreground` "Tinkr" + `text-indigo-500` "Kit"
-  - Works in light AND dark mode without any theme detection
-  - **Do NOT add img/png logo references to any rendered component**
-- [x] `Navbar.tsx` — Logo (JSX) · Side Layout toggle (homepage only) · Blog · About · 🧩 Add to Chrome · 🌙
-  - `AddToChrome` component: outlined indigo pill → modal with email waitlist → saves to localStorage
-- [x] `Footer.tsx` — Support strip (social icons + ☕) · Full tools directory (6 categories × all tools) · Chrome extension teaser · Logo (JSX) · legal links
-- [x] `ToolLayout.tsx` — wraps every tool page; auto-renders after children: SocialShare → BuyMeCoffee → HowToUse → KeywordTags → RelatedTools → RelatedPosts → AdSlot
-- [x] `SocialShare.tsx` — variants: `tool` | `footer` | `homepage`
-- [x] `BuyMeCoffee.tsx` — variants: `inline` | `footer` (links to https://buymeacoffee.com/tinkrkit)
-- [x] `HowToUse.tsx` — auto-generates 3 steps from `tool.category`; can pass custom `steps` prop
-- [x] `InputArea.tsx`, `HighlightedOutput.tsx`, `ComingSoon.tsx`, `ToolHeader.tsx`, `AdSlot.tsx`
-- [x] `KeywordTags.tsx`, `RelatedTools.tsx`, `RelatedPosts.tsx`
-- [x] `DarkModeToggle.tsx`, `ThemeProvider.tsx`, `CategoryPage.tsx`
-- [x] `BlogListing.tsx` — "use client"; receives `posts: UnifiedPost[]` + `allTags` from server; client-side search, tag filter pills, sort (latest/oldest/relevant), 10-per-page pagination
+- [x] `lib/blog.ts` + `lib/blog-data.ts` — MDX blog system (server + client-safe, now fallback only)
+- [x] `lib/supabase.ts` — `supabase` (anon key, browser-safe) + `createAdminSupabase()` (service role, server-only) + `DBPost` / `UnifiedPost` types
+- [x] `lib/auth-options.ts` — NextAuth v4 config; Google provider (guarded for missing credentials); `signIn` blocks non-ADMIN_EMAIL; JWT strategy
+- [x] `robots.txt` → replaced by `app/robots.ts` (Next.js Metadata API)
+- [x] `public/tinkrkit-icon.png` — favicon
+- [x] `public/tinkrkit-og.png` — Open Graph image
 
 ### Auth & Admin
-- [x] `middleware.ts` — Edge Runtime; protects `/admin/*`; redirects unauthenticated to `/admin/login`; redirects already-authenticated away from login
+- [x] `middleware.ts` — Edge Runtime; `getToken` (correct for Edge); protects `/admin/*`; redirects unauthenticated → `/admin/login`; redirects already-authenticated away from login page
 - [x] `app/api/auth/[...nextauth]/route.ts` — NextAuth v4 Google OAuth handler
-- [x] `app/admin/login/page.tsx` — Google sign-in button; `?error=AccessDenied` message; Suspense wrapper
-- [x] `app/admin/blog/page.tsx` — "use client"; tabs (Pending/Approved/Rejected with counts); post cards with Preview/Approve/Reject/Unpublish/Reconsider; Preview modal (full rendered markdown); Reject modal (textarea → emails author via Resend)
-- [x] `app/api/admin/posts/route.ts` — GET all posts with `?status=` filter; service role key; auth-checked via JWT
-- [x] `app/api/admin/posts/[id]/route.ts` — PATCH approve/reject/unpublish/reconsider + GET single post; Resend rejection email; auth-checked
-- [x] `supabase/schema.sql` — `blog_posts` table + indexes + RLS (public SELECT approved, public INSERT pending, service role bypasses RLS)
+- [x] `app/admin/login/page.tsx` — Google sign-in button; `?error=AccessDenied` banner; Suspense wrapper for `useSearchParams`
+- [x] `app/admin/blog/page.tsx` — "use client"; Pending/Approved/Rejected tabs with counts; post cards; Preview modal (full rendered markdown via `marked`); Reject modal (textarea → Resend email); visible error banners for API failures
+- [x] `app/api/admin/posts/route.ts` — GET all posts `?status=all|pending|approved|rejected`; **uses `getServerSession`** (correct for App Router); service role Supabase
+- [x] `app/api/admin/posts/[id]/route.ts` — PATCH approve/reject/unpublish/reconsider + GET single post; **uses `getServerSession`**; Resend rejection email; full error handling
+- [x] `supabase/schema.sql` — `blog_posts` table + GIN index on tags + RLS (anon SELECT approved, anon INSERT pending, service role bypasses)
+- [x] `supabase/seed.sql` — inserts 5 MDX blog posts into Supabase as `approved` (idempotent via ON CONFLICT)
+
+### Supabase Blog System
+- [x] `app/blog/page.tsx` — Server Component; fetches approved posts from Supabase + MDX; passes to `<BlogListing>`; `force-dynamic` (no cache); logs Supabase errors to console
+- [x] `app/blog/[slug]/page.tsx` — **Supabase first**, MDX fallback; `maybeSingle()` (no throw on 0 rows); social share buttons; related posts; read time; submit CTA
+- [x] `app/blog/submit/page.tsx` — "use client"; Quick Submit form (title/slug auto-gen/description/content with live preview/tags/author/email/related tool dropdown); GitHub PR option with copyable MDX template; inserts directly to Supabase anon key
+- [x] `components/BlogListing.tsx` — "use client"; search, tag filter pills, sort (latest/oldest/relevant), 10-per-page pagination with prev/next
+
+### Sitemap & SEO
+- [x] `app/sitemap.ts` — dynamic `/sitemap.xml`; 64 tool pages (priority 0.8), homepage (1.0), blog (0.7), static pages (0.5); fetches Supabase approved posts; revalidates hourly
+- [x] `app/robots.ts` — `/robots.txt`; `Disallow: /admin/`; links to sitemap
+
+### Components
+- [x] `Logo.tsx` — **Single source of truth.** Pure JSX, no image files. `text-foreground` "Tinkr" + `text-indigo-500` "Kit". Works in light AND dark.
+- [x] `Navbar.tsx` — Logo · Side Layout toggle (homepage only) · Blog · About · 🧩 Add to Chrome (→ Chrome Web Store) · 🌙
+- [x] `Footer.tsx` — Social strip · Full tools directory · Chrome extension teaser (→ Chrome Web Store) · Logo · legal links
+- [x] `ToolLayout.tsx` — wraps every tool; auto-renders: SocialShare → BuyMeCoffee → HowToUse → KeywordTags → RelatedTools → RelatedPosts → AdSlot
+- [x] `SocialShare.tsx`, `BuyMeCoffee.tsx`, `HowToUse.tsx`, `KeywordTags.tsx`, `RelatedTools.tsx`, `RelatedPosts.tsx`
+- [x] `InputArea.tsx`, `HighlightedOutput.tsx`, `ComingSoon.tsx`, `ToolHeader.tsx`, `AdSlot.tsx`
+- [x] `DarkModeToggle.tsx`, `ThemeProvider.tsx`, `CategoryPage.tsx`
+- [x] `BlogListing.tsx` — client-side search, tag filter, sort, pagination
 
 ### Pages
 - [x] Homepage (`/`) — hero + search + categories + popular tools + adblock banner + Side Layout mode
 - [x] About (`/about`) — Buy Me a Coffee + Chrome Extension teaser
 - [x] `/contact` — Formspree form (ID `xpwzqjbn` — replace with real ID)
 - [x] `/privacy`, `/terms`, `/content-policy`
-- [x] Blog listing (`/blog`) — server component merges MDX + Supabase approved posts; passes to `<BlogListing>` client component; search, tag filter, sort, pagination (10/page)
-- [x] Blog post (`/blog/[slug]`) — tries MDX first, falls back to Supabase; shows author, read time, tags, social share, related posts, submit-your-post CTA
-- [x] Blog submit (`/blog/submit`) — two options: Quick Submit form (title/slug/description/content with live preview/tags/author/email/tool) → inserts to Supabase as `pending`; GitHub PR option with copyable MDX template
-- [x] Admin login (`/admin/login`) — Google OAuth only; access denied message for wrong accounts
-- [x] Admin blog (`/admin/blog`) — full CRUD for submitted posts with email notifications
+- [x] Blog listing (`/blog`) — Supabase + MDX merge; search; tag filter pills; sort; 10/page pagination
+- [x] Blog post (`/blog/[slug]`) — Supabase primary, MDX fallback; read time; author; social share; related posts; submit CTA
+- [x] Blog submit (`/blog/submit`) — Quick Submit form + GitHub PR option
+- [x] Admin login (`/admin/login`) — Google OAuth only; AccessDenied error message
+- [x] Admin blog (`/admin/blog`) — full CRUD; preview modal; reject with email notification
 
 ### Tools — 64 total, all fully working
 
@@ -84,7 +90,7 @@ Phase 1: json-formatter, json-validator, json-minifier, xml-formatter, xml-to-js
 Phase 3: base64, url-encoder, html-encoder, jwt-decoder, regex-tester, uuid-generator, hash-generator, cron-builder, timestamp-converter, color-converter, diff-checker, base-converter, json-schema, html-preview
 
 #### Image — 12 tools (`/image/[slug]`)
-image-compressor, jpg-to-png, png-to-jpg, png-to-webp, webp-to-jpg, image-resizer, image-to-base64, base64-to-image, svg-optimizer, image-metadata, **svg-to-png**, **svg-to-jpeg**
+image-compressor, jpg-to-png, png-to-jpg, png-to-webp, webp-to-jpg, image-resizer, image-to-base64, base64-to-image, svg-optimizer, image-metadata, svg-to-png, svg-to-jpeg
 
 #### PDF — 3 tools (`/pdf/[slug]`)
 pdf-to-text, pdf-page-counter, pdf-metadata
@@ -101,97 +107,46 @@ unit-converter, number-converter, percentage-calculator, bmi-calculator, age-cal
 
 ### Chrome Extension (`/chrome-extension/` — standalone, not part of Next.js build)
 - [x] `manifest.json` — Manifest V3; permissions: `storage`, `tabs`, `contextMenus`; service worker active
-- [x] `popup.html` — dark theme, 340px × 560px max; header / search / category tabs / tools list / footer
-- [x] `popup.css` — system fonts (offline-safe), `#6366F1` accent, custom scrollbar, all layout tokens
-- [x] `popup.js` — 64 tools with emoji icons, category tabs (`data-cat`), real-time search, clear button,  
-  `chrome.storage.local` persistence (last category), keyboard shortcut `/` → focus search, `Esc` → clear
-- [x] `background.js` — **ACTIVE** service worker; registers right-click "Open in TinkrKit" context menu;  
-  auto-detects: JSON · JWT · XML · SQL · YAML · CSV · Regex · Unix timestamp · Base64 · Markdown · long text
-- [x] `content_script.js` — Phase 2 content bridge (commented out — not yet needed)
+- [x] `popup.html` — dark theme, 340×560px max; header / search / category tabs / tools list / footer
+- [x] `popup.css` — system fonts (offline-safe), `#6366F1` accent, custom scrollbar
+- [x] `popup.js` — 64 tools with emoji icons; category tabs; real-time search + clear button; `chrome.storage.local` persistence; `/` → focus search, `Esc` → clear
+- [x] `background.js` — **ACTIVE** service worker; "Open in TinkrKit" context menu; auto-detects JSON · JWT · XML · SQL · YAML · CSV · Regex · Unix timestamp · Base64 · Markdown · long text
+- [x] `content_script.js` — Phase 2 bridge (commented out — not needed yet)
 - [x] `icons/` — icon16/32/48/128.png (all present)
-- [x] `README.md` — load unpacked guide · testing checklist · right-click detection table · Chrome Web Store publishing steps
+- [x] `README.md` — load unpacked guide · testing checklist · detection table · Chrome Web Store publishing steps
 
 ---
 
 ## ⏳ PENDING — Must do before launch
 
-| Item | Where | Notes |
-|---|---|---|
-| **Run Supabase schema** | Supabase dashboard → SQL Editor | Paste + run `supabase/schema.sql` |
-| **Fill SUPABASE_SERVICE_ROLE_KEY** | `.env.local` | Supabase dashboard → Settings → API → service_role |
-| **Generate NEXTAUTH_SECRET** | `.env.local` | `openssl rand -base64 32` |
-| **Create Google OAuth app** | console.cloud.google.com | See CLAUDE.md Google OAuth section below |
-| **Add RESEND_API_KEY** | `.env.local` + Vercel env | resend.com → API Keys; verify tinkrkit.dev domain |
-| Deploy to Vercel | — | `vercel --prod`; add all env vars in Vercel dashboard |
-| Connect custom domain | Vercel dashboard | tinkrkit.dev |
-| Google Analytics | `app/layout.tsx` | Add GA4 tracking ID |
-| Generate sitemap.xml | `app/sitemap.ts` | Submit to Google Search Console |
-| Formspree setup | `app/contact/page.tsx` | Replace ID `xpwzqjbn` with real ID from formspree.io |
-| Google AdSense | `components/AdSlot.tsx` | Replace placeholder with live ad units once approved |
-| Update Chrome Store URL | `components/Navbar.tsx` `CHROME_STORE_URL` | Once extension is published, replace search URL with direct listing URL |
-| Mobile testing | — | iPhone + Android |
-| Lighthouse score | — | Target 90+ |
-| Buy Me a Coffee | — | Sign up at buymeacoffee.com/tinkrkit (placeholder URL is live in code) |
-| Social media accounts | — | Create @tinkrkit on Twitter/X, LinkedIn, Instagram, Facebook |
+| Priority | Item | Where | Notes |
+|---|---|---|---|
+| 🔴 High | **Deploy to Vercel** | — | `vercel --prod`; add ALL env vars in Vercel dashboard |
+| 🔴 High | **Connect custom domain** | Vercel dashboard | tinkrkit.dev |
+| 🔴 High | **Verify tinkrkit.dev in Resend** | resend.com dashboard | Required before rejection emails send from `blog@tinkrkit.dev` |
+| 🟡 Medium | **Google Analytics GA4** | `app/layout.tsx` | Add GA4 `measurementId` |
+| 🟡 Medium | **Submit sitemap.xml** | Google Search Console | After domain is connected |
+| 🟡 Medium | **Formspree setup** | `app/contact/page.tsx` | Replace ID `xpwzqjbn` with real ID from formspree.io |
+| 🟡 Medium | **Mobile testing** | — | iPhone + Android |
+| 🟡 Medium | **Lighthouse score** | — | Target 90+ |
+| 🟢 Low | **Google AdSense** | `components/AdSlot.tsx` | Replace placeholder once approved |
+| 🟢 Low | **Buy Me a Coffee** | — | Sign up at buymeacoffee.com/tinkrkit |
+| 🟢 Low | **Social media accounts** | — | @tinkrkit on Twitter/X, LinkedIn, Instagram, Facebook |
+| 🟢 Low | **Publish Chrome extension** | Chrome Web Store | Then update `CHROME_STORE_URL` in `components/Navbar.tsx` |
+
+---
 
 ## 🔜 NEXT BUILD (Phase 5)
 
 | Tool | Priority |
 |---|---|
 | QR Code Generator | High |
-| Password Generator / Strength Checker | High |
+| Password Generator + Strength Checker | High |
 | Meta Tag Generator | Medium |
 | OG Image Preview | Medium |
 | Robots.txt Generator | Low |
 | Sitemap Generator | Low |
-| Chrome Extension Phase 2 | Low (activate background.js + content_script.js) |
-| Submit extension to Chrome Web Store | Low |
 | Blog — expand to 20+ posts | Ongoing |
-
----
-
-## Google OAuth Setup (for /admin)
-
-```
-1. Go to console.cloud.google.com → New project: "TinkrKit"
-2. APIs & Services → OAuth consent screen
-   - User type: External
-   - App name: TinkrKit Admin
-   - Add your email as a test user: manirockzzz007@gmail.com
-3. APIs & Services → Credentials → Create Credentials → OAuth Client ID
-   - Application type: Web application
-   - Name: TinkrKit Web
-   - Authorized redirect URIs:
-       http://localhost:3000/api/auth/callback/google
-       https://tinkrkit.dev/api/auth/callback/google
-4. Copy Client ID + Client Secret → add to .env.local:
-   GOOGLE_CLIENT_ID=xxx
-   GOOGLE_CLIENT_SECRET=xxx
-5. Set ADMIN_EMAIL=manirockzzz007@gmail.com (already done in .env.local)
-6. Add all env vars to Vercel dashboard before deploying
-```
-
-## Auth Architecture Notes
-
-### NextAuth v4 (IMPORTANT)
-- Config: `lib/auth-options.ts`
-- Route handler: `app/api/auth/[...nextauth]/route.ts`
-- `signIn` callback returns false for any email ≠ `ADMIN_EMAIL` — no session ever created
-- JWT session strategy — sessions stored in cookies, not DB
-- `NEXTAUTH_SECRET` MUST be set or JWT decoding fails in middleware
-
-### Supabase
-- `lib/supabase.ts` exports two clients:
-  - `supabase` (anon key) — safe for browser, use in "use client" components
-  - `createAdminSupabase()` (service role) — server-only, call only in API routes
-- RLS enforced: anon key can only SELECT approved + INSERT pending
-- Service role bypasses RLS — used by `/api/admin/*` routes only
-
-### Admin flow
-1. Visit `/admin/blog` → middleware checks JWT → redirects to `/admin/login` if no session
-2. Click "Sign in with Google" → Google OAuth → `signIn` callback checks email
-3. Wrong email → AccessDenied → `/admin/login?error=AccessDenied`
-4. Correct email → JWT token created → redirect to `/admin/blog`
 
 ---
 
@@ -209,15 +164,38 @@ unit-converter, number-converter, percentage-calculator, bmi-calculator, age-cal
 - `public/tinkrkit-*.png` files exist ONLY for: favicon in `<head>`, OG/Twitter meta tags
 - Never add `<img src="/tinkrkit-logo-*.png">` to any component
 
+### Add to Chrome button
+- `components/Navbar.tsx` → `CHROME_STORE_URL` constant at top of file
+- Currently points to `https://chromewebstore.google.com/search/TinkrKit`
+- Update to the direct listing URL once the extension is published
+
+### NextAuth v4 (CRITICAL — auth patterns)
+- Config: `lib/auth-options.ts` (guarded GoogleProvider, JWT strategy)
+- Route handler: `app/api/auth/[...nextauth]/route.ts`
+- **Middleware** → uses `getToken` from `next-auth/jwt` (Edge Runtime ✓)
+- **API Route Handlers** → uses `getServerSession(authOptions)` (Node.js Runtime ✓)
+- **NEVER use `getToken` in App Router route handlers** — use `getServerSession`
+- `signIn` callback returns false for any email ≠ `ADMIN_EMAIL`; no session created
+- `NEXTAUTH_SECRET` must be set for JWT signing/verification
+
+### Supabase (two clients)
+- `supabase` (anon key) — safe for browser; use in "use client" components and Server Components for public reads
+- `createAdminSupabase()` (service role) — server-only; call ONLY in `/api/admin/*` route handlers
+- RLS: anon key SELECT approved only · anon key INSERT pending only · service role bypasses all RLS
+- Blog listing: `force-dynamic` so new approved posts appear without a redeploy
+
+### Blog data flow
+```
+Submit → Supabase (status: pending)
+Admin approves → Supabase (status: approved, published_at: now)
+/blog listing → fetches Supabase approved + MDX, merges by date, deduplicates (DB wins on slug tie)
+/blog/[slug] → Supabase first (maybeSingle), MDX fallback, 404 if neither
+```
+
 ### Webpack cache fix
 - `next.config.mjs` sets `config.cache = { type: 'memory' }` in dev
 - `package.json` `dev` script: `rm -rf .next && next dev`
 - Together these permanently prevent `ENOENT .pack.gz` errors
-
-### dev script vs restart.sh
-- `npm run dev` — self-healing, always clears `.next` first. Use this for normal development.
-- `./restart.sh` — use when a dev server is already running and needs to be killed first
-- `./restart.sh --hard` — also clears `node_modules/.cache` (rarely needed)
 
 ### Component usage pattern
 ```tsx
@@ -237,15 +215,13 @@ export default function Page() {
 ```
 
 ToolLayout auto-renders after children (in order):
-1. SocialShare (tool variant) — share buttons
-2. BuyMeCoffee (inline variant) — ☕ yellow button
+1. SocialShare (tool variant)
+2. BuyMeCoffee (inline variant)
 3. HowToUse — 3 auto-generated steps from `tool.category`
 4. KeywordTags
 5. RelatedTools (4 cards)
 6. RelatedPosts
 7. AdSlot (mobile below, desktop sidebar)
-
-Custom howToSteps override: `<ToolLayout howToSteps={["step 1", "step 2", "step 3"]}>`
 
 ### PDF tools (pdfjs-dist v5.7.284)
 ```tsx
@@ -272,3 +248,28 @@ const pdfDoc = await pdfjsLib.getDocument({ data: new Uint8Array(arrayBuffer) })
 - Do NOT use `next/image` — use `<img>` with `eslint-disable-next-line @next/next/no-img-element`
 - All tool pages must be `"use client"` (they use browser APIs)
 - Import `cn` from `"@/lib/utils"` for conditional classNames
+- `marked.parse()` returns `string` synchronously (v18, no async option) — `as string` cast is safe
+
+### Google OAuth Setup (for /admin)
+```
+1. console.cloud.google.com → New project: TinkrKit
+2. APIs & Services → OAuth consent screen → External → add manirockzzz007@gmail.com as test user
+3. Credentials → Create OAuth Client ID → Web application
+   Authorized redirect URIs:
+     http://localhost:3000/api/auth/callback/google
+     https://tinkrkit.dev/api/auth/callback/google
+4. Copy Client ID + Secret → .env.local → GOOGLE_CLIENT_ID / GOOGLE_CLIENT_SECRET
+5. Add all env vars to Vercel before deploying
+```
+
+### Vercel env vars required
+All vars from `.env.local` must be added to Vercel dashboard:
+- `NEXT_PUBLIC_SUPABASE_URL`
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+- `SUPABASE_SERVICE_ROLE_KEY`
+- `NEXTAUTH_SECRET`
+- `NEXTAUTH_URL` → set to `https://tinkrkit.dev` (not localhost)
+- `GOOGLE_CLIENT_ID`
+- `GOOGLE_CLIENT_SECRET`
+- `ADMIN_EMAIL`
+- `RESEND_API_KEY`
