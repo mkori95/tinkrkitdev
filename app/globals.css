@@ -2,26 +2,92 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
-body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
-}
-
 @layer utilities {
-  .text-balance {
-    text-wrap: balance;
+  .text-balance { text-wrap: balance; }
+}
+
+/* Syntax highlight tokens (rendered inside dark bg #1e1e2e) */
+.syntax-block { color: #cdd6f4; }
+.json-key  { color: #89b4fa; }
+.json-str  { color: #a6e3a1; }
+.json-num  { color: #fab387; }
+.json-bool { color: #f38ba8; }
+.json-null { color: #9399b2; }
+.xml-tag        { color: #89b4fa; }
+.xml-bracket    { color: #9399b2; }
+.xml-attr-name  { color: #cba6f7; }
+.xml-attr-val   { color: #a6e3a1; }
+.xml-comment    { color: #6c7086; font-style: italic; }
+
+/* Prose styles — shared by Markdown preview and Blog posts */
+.prose { color: hsl(var(--foreground)); line-height: 1.75; }
+.prose h1,.prose h2,.prose h3,.prose h4 { font-weight: 700; margin: 1.5em 0 0.6em; line-height: 1.3; color: hsl(var(--foreground)); }
+.prose h1 { font-size: 1.75rem; } .prose h2 { font-size: 1.35rem; border-bottom: 1px solid hsl(var(--border)); padding-bottom: 0.3em; } .prose h3 { font-size: 1.1rem; }
+.prose p { margin: 1em 0; }
+.prose a { color: hsl(var(--primary)); text-decoration: underline; text-underline-offset: 3px; }
+.prose ul,.prose ol { padding-left: 1.5rem; margin: 0.75em 0; }
+.prose ul { list-style-type: disc; } .prose ol { list-style-type: decimal; }
+.prose li { margin: 0.4em 0; }
+.prose blockquote { border-left: 3px solid hsl(var(--primary)); padding-left: 1rem; margin: 1.25em 0; color: hsl(var(--muted-foreground)); font-style: italic; }
+.prose code:not(pre code) { background: hsl(var(--muted)); border-radius: 4px; padding: 0.15em 0.4em; font-size: 0.85em; font-family: var(--font-mono), monospace; color: hsl(var(--foreground)); }
+.prose pre { background: #1e1e2e; color: #cdd6f4; border-radius: 8px; padding: 1.25rem; overflow-x: auto; margin: 1.25em 0; font-size: 0.85rem; line-height: 1.6; }
+.prose pre code { background: none; padding: 0; font-family: var(--font-mono), monospace; }
+.prose table { border-collapse: collapse; width: 100%; margin: 1.25em 0; font-size: 0.9rem; }
+.prose th,.prose td { border: 1px solid hsl(var(--border)); padding: 0.5rem 0.75rem; text-align: left; }
+.prose th { background: hsl(var(--muted)); font-weight: 600; }
+.prose hr { border: none; border-top: 1px solid hsl(var(--border)); margin: 2em 0; }
+.prose strong { font-weight: 700; color: hsl(var(--foreground)); }
+.prose em { font-style: italic; }
+.prose img { max-width: 100%; border-radius: 8px; margin: 1em 0; }
+
+@layer base {
+  :root {
+    --background: 0 0% 98%;
+    --foreground: 0 0% 7%;
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 7%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 7%;
+    --primary: 239 84% 67%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 0 0% 96%;
+    --secondary-foreground: 0 0% 13%;
+    --muted: 0 0% 96%;
+    --muted-foreground: 0 0% 53%;
+    --accent: 0 0% 96%;
+    --accent-foreground: 0 0% 13%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 0 0% 91%;
+    --input: 0 0% 91%;
+    --ring: 239 84% 67%;
+    --radius: 0.625rem;
+  }
+  .dark {
+    --background: 0 0% 6%;
+    --foreground: 0 0% 97%;
+    --card: 0 0% 10%;
+    --card-foreground: 0 0% 97%;
+    --popover: 0 0% 10%;
+    --popover-foreground: 0 0% 97%;
+    --primary: 239 84% 67%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 0 0% 15%;
+    --secondary-foreground: 0 0% 97%;
+    --muted: 0 0% 15%;
+    --muted-foreground: 0 0% 55%;
+    --accent: 0 0% 15%;
+    --accent-foreground: 0 0% 97%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 0 0% 18%;
+    --input: 0 0% 18%;
+    --ring: 239 84% 67%;
+  }
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
   }
 }

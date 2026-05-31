@@ -1,0 +1,96 @@
+---
+title: "YAML Tutorial — Syntax, Examples, and Common Errors"
+slug: "yaml-tutorial-syntax-examples"
+date: "2026-05-28"
+description: "Learn YAML syntax with real examples, understand common errors, and validate your YAML files instantly for free."
+tags: ["yaml", "tutorial", "developer tools", "config", "devops"]
+relatedTool: "/developer/yaml-formatter"
+relatedToolName: "YAML Formatter"
+---
+
+# YAML Tutorial — Syntax, Examples, and Common Errors
+
+YAML (YAML Ain't Markup Language) is a human-readable data format used mostly for configuration files. If you've worked with Docker, Kubernetes, GitHub Actions, or any CI/CD tool — you've written YAML.
+
+## Basic YAML Syntax
+
+```yaml
+name: Mani
+age: 29
+city: Atlanta
+skills:
+  - JavaScript
+  - Swift
+  - Python
+active: true
+```
+
+No curly braces. No quotes needed for simple strings. Indentation defines structure.
+
+## YAML Data Types
+
+```yaml
+# String
+name: tinkrkit.dev
+
+# Number
+version: 1.0
+
+# Boolean
+enabled: true
+
+# Null
+value: null
+
+# List
+tools:
+  - JSON
+  - XML
+  - YAML
+
+# Nested object
+database:
+  host: localhost
+  port: 5432
+```
+
+## Most Common YAML Errors
+
+### 1. Wrong indentation
+YAML uses spaces — never tabs. Mixing them breaks everything.
+
+```yaml
+# Wrong
+parent:
+	child: value  # tab used here — INVALID
+
+# Correct
+parent:
+  child: value  # 2 spaces — valid
+```
+
+### 2. Missing space after colon
+```yaml
+# Wrong
+name:Mani
+
+# Correct
+name: Mani
+```
+
+### 3. Unquoted special characters
+```yaml
+# Wrong — colon in value breaks parsing
+message: Hello: World
+
+# Correct
+message: "Hello: World"
+```
+
+## YAML vs JSON
+
+YAML is a superset of JSON — valid JSON is valid YAML. But YAML is more readable for config files and supports comments (JSON doesn't).
+
+## Validate Your YAML Instantly
+
+Use our free [YAML Formatter and Validator](/developer/yaml-formatter) to check your YAML for errors, format it cleanly, and convert it to JSON. No login required. 100% browser-based.

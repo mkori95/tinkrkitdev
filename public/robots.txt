@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://tinkrkit.dev/sitemap.xml

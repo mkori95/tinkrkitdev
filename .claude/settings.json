@@ -1,0 +1,24 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__Claude_Preview__preview_screenshot",
+      "mcp__Claude_Preview__preview_list",
+      "mcp__Claude_Preview__preview_console_logs",
+      "mcp__Claude_Preview__preview_logs",
+      "mcp__Claude_Preview__preview_snapshot",
+      "mcp__Claude_Preview__preview_network",
+      "mcp__Claude_in_Chrome__tabs_context_mcp",
+      "Bash(aws logs *)",
+      "Bash(aws dynamodb get-item *)",
+      "Bash(aws dynamodb scan *)",
+      "Bash(aws dynamodb describe-table *)",
+      "Bash(aws events list-rules *)",
+      "Bash(aws lambda list-event-source-mappings *)",
+      "Bash(npx tsc --noEmit)",
+      "Bash(docker info)",
+      "mcp__Claude_in_Chrome__navigate",
+      "mcp__Claude_in_Chrome__browser_batch",
+      "mcp__Claude_in_Chrome__computer"
+    ]
+  }
+}

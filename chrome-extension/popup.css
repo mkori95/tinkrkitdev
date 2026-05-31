@@ -1,0 +1,321 @@
+/* TinkrKit Extension — popup.css */
+/* No Google Fonts — works fully offline */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --bg:         #0F0F0F;
+  --surface:    #1A1A1A;
+  --surface2:   #222222;
+  --border:     #2A2A2A;
+  --accent:     #6366F1;
+  --accent-dim: rgba(99, 102, 241, 0.12);
+  --accent-hover: rgba(99, 102, 241, 0.18);
+  --text:       #FFFFFF;
+  --text-muted: #888888;
+  --text-dim:   #555555;
+  --radius:     8px;
+  --font: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+html, body {
+  width: 340px;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 13px;
+  line-height: 1.4;
+  overflow: hidden;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  max-height: 560px;
+}
+
+/* ── Header ────────────────────────────────────────────────────────────── */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px 10px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.header-logo {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.logo-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  background: var(--accent);
+  border-radius: 7px;
+  flex-shrink: 0;
+}
+
+.header-text {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.logo-wordmark {
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+  line-height: 1;
+}
+
+.logo-tinkr { color: #FFFFFF; }
+.logo-kit   { color: var(--accent); }
+
+.logo-subtitle {
+  font-size: 10px;
+  color: var(--text-muted);
+  letter-spacing: 0.2px;
+}
+
+/* ── Search ────────────────────────────────────────────────────────────── */
+.search-wrap {
+  position: relative;
+  padding: 10px 14px 8px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.search-icon {
+  position: absolute;
+  left: 24px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+.search-input {
+  width: 100%;
+  padding: 7px 28px 7px 30px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 12.5px;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.search-input::placeholder { color: var(--text-dim); }
+
+.search-input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(99,102,241,0.15);
+}
+
+.search-clear {
+  position: absolute;
+  right: 22px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: var(--text-dim);
+  cursor: pointer;
+  font-size: 11px;
+  padding: 2px 4px;
+  border-radius: 3px;
+  line-height: 1;
+  transition: color 0.1s;
+}
+.search-clear:hover { color: var(--text); }
+
+/* ── Category tabs ─────────────────────────────────────────────────────── */
+.tabs-wrap {
+  padding: 8px 14px 0;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.tabs {
+  display: flex;
+  gap: 5px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+  scrollbar-width: none;
+}
+.tabs::-webkit-scrollbar { display: none; }
+
+.tab {
+  flex-shrink: 0;
+  padding: 4px 10px;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-muted);
+  font-family: var(--font);
+  font-size: 11.5px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+
+.tab:hover {
+  border-color: var(--accent);
+  color: var(--text);
+  background: var(--accent-dim);
+}
+
+.tab.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+/* ── Tools list ────────────────────────────────────────────────────────── */
+.tools-wrap {
+  flex: 1;
+  overflow-y: auto;
+  padding: 4px 0 4px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+  min-height: 0;
+}
+
+.tools-wrap::-webkit-scrollbar { width: 4px; }
+.tools-wrap::-webkit-scrollbar-track { background: transparent; }
+.tools-wrap::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 4px;
+}
+.tools-wrap::-webkit-scrollbar-thumb:hover {
+  background: #3a3a3a;
+}
+
+/* Category heading */
+.cat-heading {
+  padding: 8px 14px 3px;
+  font-size: 9.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--text-dim);
+  user-select: none;
+}
+
+/* Tool row */
+.tool-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 14px;
+  cursor: pointer;
+  transition: background 0.1s;
+  border-radius: 0;
+}
+
+.tool-row:hover {
+  background: var(--accent-hover);
+}
+
+.tool-row:hover .tool-name {
+  color: var(--accent);
+}
+
+.tool-icon {
+  font-size: 14px;
+  width: 20px;
+  text-align: center;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.tool-name {
+  flex: 1;
+  font-size: 12.5px;
+  color: var(--text);
+  font-weight: 400;
+  transition: color 0.1s;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tool-arrow {
+  font-size: 10px;
+  color: var(--text-dim);
+  flex-shrink: 0;
+  transition: color 0.1s, transform 0.1s;
+}
+
+.tool-row:hover .tool-arrow {
+  color: var(--accent);
+  transform: translateX(2px);
+}
+
+/* No results */
+.no-results {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 28px 14px;
+  text-align: center;
+  gap: 8px;
+}
+
+.no-results-icon {
+  font-size: 24px;
+  opacity: 0.4;
+}
+
+.no-results p {
+  font-size: 12px;
+  color: var(--text-dim);
+}
+
+/* ── Footer ────────────────────────────────────────────────────────────── */
+.footer {
+  border-top: 1px solid var(--border);
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.open-btn {
+  flex: 1;
+  padding: 8px 14px;
+  background: var(--accent);
+  border: none;
+  border-radius: var(--radius);
+  color: #fff;
+  font-family: var(--font);
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s;
+  text-align: center;
+}
+
+.open-btn:hover { opacity: 0.88; }
+
+.version {
+  font-size: 10px;
+  color: var(--text-dim);
+  white-space: nowrap;
+  flex-shrink: 0;
+}

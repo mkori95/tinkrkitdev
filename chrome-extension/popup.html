@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TinkrKit</title>
+  <link rel="stylesheet" href="popup.css" />
+</head>
+<body>
+
+  <!-- ── Header ─────────────────────────────────────────────────────────── -->
+  <div class="header">
+    <div class="header-logo">
+      <div class="logo-icon">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"
+            stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div class="header-text">
+        <span class="logo-wordmark"><span class="logo-tinkr">Tinkr</span><span class="logo-kit">Kit</span></span>
+        <span class="logo-subtitle">tinkrkit.dev</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Search ──────────────────────────────────────────────────────────── -->
+  <div class="search-wrap">
+    <svg class="search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <circle cx="11" cy="11" r="8" stroke="#666" stroke-width="2"/>
+      <path d="m21 21-4.35-4.35" stroke="#666" stroke-width="2" stroke-linecap="round"/>
+    </svg>
+    <input
+      id="searchInput"
+      class="search-input"
+      type="text"
+      placeholder="Search tools..."
+      autocomplete="off"
+      spellcheck="false"
+    />
+    <button id="searchClear" class="search-clear" aria-label="Clear search" style="display:none">✕</button>
+  </div>
+
+  <!-- ── Category tabs ───────────────────────────────────────────────────── -->
+  <div class="tabs-wrap">
+    <div class="tabs" id="tabs" role="tablist">
+      <button class="tab active" data-cat="all" role="tab" aria-selected="true">All</button>
+      <button class="tab" data-cat="developer" role="tab">Developer</button>
+      <button class="tab" data-cat="image" role="tab">Image</button>
+      <button class="tab" data-cat="pdf" role="tab">PDF</button>
+      <button class="tab" data-cat="file" role="tab">File</button>
+      <button class="tab" data-cat="text" role="tab">Text</button>
+      <button class="tab" data-cat="math" role="tab">Math</button>
+    </div>
+  </div>
+
+  <!-- ── Tools list ─────────────────────────────────────────────────────── -->
+  <div class="tools-wrap" id="toolsWrap">
+    <div id="toolsList"></div>
+    <div id="noResults" class="no-results" style="display:none">
+      <span class="no-results-icon">🔍</span>
+      <p>No tools found</p>
+    </div>
+  </div>
+
+  <!-- ── Footer ─────────────────────────────────────────────────────────── -->
+  <div class="footer">
+    <button id="openSite" class="open-btn">Open TinkrKit →</button>
+    <span class="version">v1.0.0</span>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

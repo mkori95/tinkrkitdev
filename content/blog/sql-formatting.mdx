@@ -1,0 +1,69 @@
+---
+title: "SQL Formatting Best Practices for Clean, Readable Queries"
+slug: "sql-formatting-best-practices"
+date: "2026-05-28"
+description: "Learn SQL formatting best practices with examples, and format your SQL queries instantly with our free online SQL formatter."
+tags: ["sql", "formatting", "database", "developer tools", "best practices"]
+relatedTool: "/developer/sql-formatter"
+relatedToolName: "SQL Formatter"
+---
+
+# SQL Formatting Best Practices for Clean, Readable Queries
+
+Unformatted SQL is a nightmare to debug, review, or hand off to another developer. Good formatting makes queries readable at a glance.
+
+## Before and After
+
+**Unformatted:**
+```sql
+select u.id,u.name,u.email,o.total from users u inner join orders o on u.id=o.user_id where o.total>100 and u.active=true order by o.total desc limit 10
+```
+
+**Formatted:**
+```sql
+SELECT
+  u.id,
+  u.name,
+  u.email,
+  o.total
+FROM users u
+INNER JOIN orders o ON u.id = o.user_id
+WHERE
+  o.total > 100
+  AND u.active = true
+ORDER BY o.total DESC
+LIMIT 10;
+```
+
+Same query. The formatted version is instantly readable.
+
+## Key Formatting Rules
+
+### 1. Uppercase keywords
+`SELECT`, `FROM`, `WHERE`, `JOIN`, `ORDER BY` — always uppercase. Column and table names lowercase or as-is.
+
+### 2. One clause per line
+Each major clause (`SELECT`, `FROM`, `WHERE`, `JOIN`) starts on a new line.
+
+### 3. Indent columns and conditions
+List selected columns indented under `SELECT`. List `WHERE` conditions indented and aligned.
+
+### 4. Align JOIN conditions
+```sql
+INNER JOIN orders o ON u.id = o.user_id
+LEFT JOIN products p ON o.product_id = p.id
+```
+
+### 5. Always end with a semicolon
+Especially important when running multiple queries.
+
+## Common SQL Formatting Mistakes
+
+- Mixing uppercase and lowercase keywords (`Select`, `select`, `SELECT`)
+- Everything on one line — impossible to read
+- No spaces around operators (`u.id=o.user_id` vs `u.id = o.user_id`)
+- Missing aliases on joined tables
+
+## Format Your SQL Instantly
+
+Stop manually formatting SQL. Use our free [SQL Formatter](/developer/sql-formatter) to beautify any SQL query instantly. Supports MySQL, PostgreSQL, SQLite, and more. No login required.
