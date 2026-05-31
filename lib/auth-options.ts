@@ -1,19 +1,35 @@
 // lib/auth-options.ts
-// Shared NextAuth config — imported by the route handler and (via getToken) middleware.
+// Shared NextAuth config — used by the route handler AND getServerSession calls.
 
 import type { NextAuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 
+// Guard: if Google credentials aren't set (dev before OAuth setup), we still
+// export a valid authOptions so the server doesn't crash.  The Google provider
+// simply won't be included and login will show a "Configuration" error from
+// NextAuth — which is better than a 500 on every request.
+const googleConfigured =
+  !!process.env.GOOGLE_CLIENT_ID && !!process.env.GOOGLE_CLIENT_SECRET;
+
+if (!googleConfigured) {
+  console.warn(
+    "[auth] GOOGLE_CLIENT_ID or GOOGLE_CLIENT_SECRET is not set.\n" +
+    "       Admin login will not work until these are added to .env.local."
+  );
+}
+
 export const authOptions: NextAuthOptions = {
-  providers: [
-    GoogleProvider({
-      clientId:     process.env.GOOGLE_CLIENT_ID!,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
-    }),
-  ],
+  providers: googleConfigured
+    ? [
+        GoogleProvider({
+          clientId:     process.env.GOOGLE_CLIENT_ID!,
+          clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+        }),
+      ]
+    : [],
 
   callbacks: {
-    // Block anyone who isn't ADMIN_EMAIL before a session is ever created.
+    // Deny anyone whose email doesn't match ADMIN_EMAIL — no session created.
     async signIn({ user }) {
       return user.email === process.env.ADMIN_EMAIL;
     },
@@ -32,6 +48,6 @@ export const authOptions: NextAuthOptions = {
 
   pages: {
     signIn: "/admin/login",
-    error:  "/admin/login", // handles AccessDenied → shows error on login page
+    error:  "/admin/login", // ?error=AccessDenied shown on login page
   },
 };

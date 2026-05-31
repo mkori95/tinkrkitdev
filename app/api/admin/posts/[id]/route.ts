@@ -1,32 +1,60 @@
-// PATCH /api/admin/posts/[id]
-// Actions: approve | reject | unpublish | reconsider
-// Rejection also sends an email to the author via Resend.
+// PATCH /api/admin/posts/[id]  — approve | reject | unpublish | reconsider
+// GET   /api/admin/posts/[id]  — fetch single post with full content (for preview)
+// Auth: getServerSession (correct for App Router route handlers).
 
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { getToken } from "next-auth/jwt";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth-options";
 import { createAdminSupabase } from "@/lib/supabase";
 import { Resend } from "resend";
 
-type Action = "approve" | "reject" | "unpublish" | "reconsider";
+// ── Shared auth helper ────────────────────────────────────────────────────────
 
-interface Body {
-  action: Action;
-  reason?: string; // required when action === "reject"
+async function requireAdmin() {
+  const session = await getServerSession(authOptions);
+  if (!session?.user?.email || session.user.email !== process.env.ADMIN_EMAIL) {
+    return null;
+  }
+  return session;
 }
+
+// ── Shared Supabase helper ────────────────────────────────────────────────────
+
+function getDb() {
+  try {
+    return { db: createAdminSupabase(), err: null };
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : "Supabase admin client failed";
+    console.error("[admin/posts/[id]]", msg);
+    return { db: null, err: msg };
+  }
+}
+
+// ── PATCH — perform an action on a post ──────────────────────────────────────
+
+type Action = "approve" | "reject" | "unpublish" | "reconsider";
+interface Body { action: Action; reason?: string; }
 
 export async function PATCH(
   req: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  // ── Auth ────────────────────────────────────────────────────────────────────
-  const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
-  if (!token || token.email !== process.env.ADMIN_EMAIL) {
+  if (!(await requireAdmin())) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
+  const { db, err } = getDb();
+  if (!db) return NextResponse.json({ error: err }, { status: 500 });
+
   const { id } = params;
-  const body: Body = await req.json();
+  let body: Body;
+  try {
+    body = await req.json();
+  } catch {
+    return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
+  }
+
   const { action, reason } = body;
 
   if (!["approve", "reject", "unpublish", "reconsider"].includes(action)) {
@@ -36,9 +64,7 @@ export async function PATCH(
     return NextResponse.json({ error: "Rejection reason required" }, { status: 400 });
   }
 
-  const db = createAdminSupabase();
-
-  // ── Fetch current post ───────────────────────────────────────────────────────
+  // Fetch current post (needed for email)
   const { data: post, error: fetchErr } = await db
     .from("blog_posts")
     .select("*")
@@ -49,42 +75,29 @@ export async function PATCH(
     return NextResponse.json({ error: "Post not found" }, { status: 404 });
   }
 
-  // ── Build update payload ─────────────────────────────────────────────────────
-  let update: Record<string, unknown> = {};
-
+  // Build update payload
+  const update: Record<string, unknown> = {};
   switch (action) {
     case "approve":
-      update = {
-        status:           "approved",
-        rejection_reason: null,
-        published_at:     new Date().toISOString(),
-      };
+      update.status           = "approved";
+      update.rejection_reason = null;
+      update.published_at     = new Date().toISOString();
       break;
-
     case "reject":
-      update = {
-        status:           "rejected",
-        rejection_reason: reason,
-        published_at:     null,
-      };
+      update.status           = "rejected";
+      update.rejection_reason = reason;
+      update.published_at     = null;
       break;
-
     case "unpublish":
-      update = {
-        status:       "pending",
-        published_at: null,
-      };
+      update.status       = "pending";
+      update.published_at = null;
       break;
-
     case "reconsider":
-      update = {
-        status:           "pending",
-        rejection_reason: null,
-      };
+      update.status           = "pending";
+      update.rejection_reason = null;
       break;
   }
 
-  // ── Apply update ─────────────────────────────────────────────────────────────
   const { error: updateErr } = await db
     .from("blog_posts")
     .update(update)
@@ -95,12 +108,12 @@ export async function PATCH(
     return NextResponse.json({ error: updateErr.message }, { status: 500 });
   }
 
-  // ── Send rejection email via Resend ──────────────────────────────────────────
+  // Send rejection email via Resend (non-blocking)
   if (action === "reject" && process.env.RESEND_API_KEY) {
     try {
       const resend = new Resend(process.env.RESEND_API_KEY);
       await resend.emails.send({
-        // Change to a verified domain once tinkrkit.dev is verified in Resend
+        // Requires tinkrkit.dev to be verified in Resend dashboard
         from:    "TinkrKit Blog <blog@tinkrkit.dev>",
         to:      post.author_email,
         subject: `Your TinkrKit blog post — "${post.title}"`,
@@ -113,13 +126,13 @@ export async function PATCH(
               <p style="margin:0;font-size:14px;color:#333"><strong>Feedback from our editor:</strong></p>
               <p style="margin:8px 0 0;color:#444;font-size:14px">${reason}</p>
             </div>
-            <p>You're welcome to revise and resubmit at <a href="https://tinkrkit.dev/blog/submit">tinkrkit.dev/blog/submit</a>.</p>
+            <p>You're welcome to revise and resubmit at
+               <a href="https://tinkrkit.dev/blog/submit">tinkrkit.dev/blog/submit</a>.</p>
             <p style="color:#888;font-size:13px">— The TinkrKit Team</p>
           </div>
         `,
       });
     } catch (emailErr) {
-      // Don't fail the request if email fails — just log it
       console.error("[admin/posts reject email]", emailErr);
     }
   }
@@ -127,17 +140,19 @@ export async function PATCH(
   return NextResponse.json({ ok: true, action });
 }
 
-// GET /api/admin/posts/[id] — fetch single post with full content (for preview)
+// ── GET — fetch single post with full content (for preview modal) ─────────────
+
 export async function GET(
   req: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
-  if (!token || token.email !== process.env.ADMIN_EMAIL) {
+  if (!(await requireAdmin())) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const db = createAdminSupabase();
+  const { db, err } = getDb();
+  if (!db) return NextResponse.json({ error: err }, { status: 500 });
+
   const { data, error } = await db
     .from("blog_posts")
     .select("*")

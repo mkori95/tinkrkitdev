@@ -285,18 +285,27 @@ function PostCard({
 export default function AdminBlogPage() {
   const [posts,      setPosts]      = useState<Post[]>([]);
   const [loading,    setLoading]    = useState(true);
+  const [fetchError, setFetchError] = useState<string | null>(null);
   const [activeTab,  setActiveTab]  = useState<Tab>("pending");
   const [busyId,     setBusyId]     = useState<string | null>(null);
+  const [actionError,setActionError]= useState<string | null>(null);
   const [previewId,  setPreviewId]  = useState<string | null>(null);
   const [rejectPost, setRejectPost] = useState<Post | null>(null);
 
   // ── Fetch all posts ──────────────────────────────────────────────────────────
   const fetchPosts = useCallback(async () => {
     setLoading(true);
+    setFetchError(null);
     try {
       const res  = await fetch("/api/admin/posts?status=all");
       const data = await res.json();
-      if (data.posts) setPosts(data.posts);
+      if (!res.ok) {
+        setFetchError(data.error ?? `API error ${res.status}`);
+        return;
+      }
+      setPosts(data.posts ?? []);
+    } catch (e) {
+      setFetchError(e instanceof Error ? e.message : "Network error");
     } finally {
       setLoading(false);
     }
@@ -311,16 +320,22 @@ export default function AdminBlogPage() {
     reason?: string
   ) {
     setBusyId(id);
+    setActionError(null);
     try {
       const res = await fetch(`/api/admin/posts/${id}`, {
         method:  "PATCH",
         headers: { "Content-Type": "application/json" },
         body:    JSON.stringify({ action, reason }),
       });
-      if (res.ok) {
-        await fetchPosts();
-        setRejectPost(null);
+      const data = await res.json();
+      if (!res.ok) {
+        setActionError(data.error ?? `Action failed (${res.status})`);
+        return;
       }
+      await fetchPosts();
+      setRejectPost(null);
+    } catch (e) {
+      setActionError(e instanceof Error ? e.message : "Network error");
     } finally {
       setBusyId(null);
     }
@@ -370,6 +385,28 @@ export default function AdminBlogPage() {
             Review, approve, and manage submitted blog posts.
           </p>
         </div>
+
+        {/* ── Error banners ────────────────────────────────────────────────── */}
+        {fetchError && (
+          <div className="mb-6 rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-400">
+            <strong>Could not load posts:</strong> {fetchError}
+            {fetchError.includes("SERVICE_ROLE_KEY") && (
+              <p className="mt-1 text-xs opacity-80">
+                Set <code>SUPABASE_SERVICE_ROLE_KEY</code> in <code>.env.local</code> and restart the dev server.
+              </p>
+            )}
+            {fetchError.includes("Unauthorized") && (
+              <p className="mt-1 text-xs opacity-80">
+                Session expired — <a href="/admin/login" className="underline">sign in again</a>.
+              </p>
+            )}
+          </div>
+        )}
+        {actionError && (
+          <div className="mb-4 rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-400">
+            <strong>Action failed:</strong> {actionError}
+          </div>
+        )}
 
         {/* ── Tabs ────────────────────────────────────────────────────────── */}
         <div className="mb-6 flex gap-1 border-b border-border">
