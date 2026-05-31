@@ -179,7 +179,91 @@ export default async function BlogPostPage({
 }: {
   params: { slug: string };
 }) {
-  // ── 1. Try MDX first ──────────────────────────────────────────────────────
+  // ── 1. Supabase is the primary source ─────────────────────────────────────
+  // Check DB first so migrated and user-submitted posts are always served
+  // from the canonical DB record. MDX files stay as a fallback for local dev
+  // or if Supabase is unavailable.
+  const { data: dbPost } = await supabase
+    .from("blog_posts")
+    .select("*")
+    .eq("slug", params.slug)
+    .eq("status", "approved")
+    .single<DBPost>();
+
+  if (dbPost) {
+    const toolObj = TOOLS.find(
+      (t) => `/${t.category}/${t.slug}` === dbPost.related_tool
+    );
+    const toolName    = toolObj?.name ?? "TinkrKit Tool";
+    const displayDate = dbPost.published_at ?? dbPost.created_at;
+
+    return (
+      <div className="flex min-h-screen flex-col">
+        <Navbar />
+        <main className="mx-auto w-full max-w-2xl flex-1 px-4 py-12 sm:px-6">
+          <Link
+            href="/blog"
+            className="mb-8 inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
+          >
+            <ArrowLeft className="h-3.5 w-3.5" /> All posts
+          </Link>
+
+          <div className="mb-8">
+            <div className="mb-3 flex flex-wrap items-center gap-3 text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
+              <span>{fmtDate(displayDate)}</span>
+              <span>·</span>
+              <span className="flex items-center gap-1"><User className="h-3 w-3" />{dbPost.author_name}</span>
+              <span>·</span>
+              <span className="flex items-center gap-1"><Clock className="h-3 w-3" />{readTime(dbPost.content)}</span>
+            </div>
+            <h1 className="text-2xl font-bold leading-snug tracking-tight sm:text-3xl">
+              {dbPost.title}
+            </h1>
+            {dbPost.description && (
+              <p className="mt-3 text-base text-muted-foreground leading-relaxed">
+                {dbPost.description}
+              </p>
+            )}
+            {dbPost.tags.length > 0 && (
+              <div className="mt-4 flex flex-wrap items-center gap-1.5">
+                <Tag className="h-3 w-3 text-muted-foreground/60" />
+                {dbPost.tags.map((tag) => (
+                  <span key={tag} className="rounded-full bg-muted/60 px-2.5 py-0.5 text-xs text-muted-foreground">
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <hr className="mb-8 border-border" />
+          <div className="prose prose-sm dark:prose-invert max-w-none">
+            <MDXRemote source={dbPost.content} options={MDX_OPTIONS} />
+          </div>
+
+          {dbPost.related_tool && (
+            <ToolCta toolPath={dbPost.related_tool} toolName={toolName} />
+          )}
+          <SocialShareButtons title={dbPost.title} slug={dbPost.slug} />
+          <RelatedPosts tags={dbPost.tags} currentSlug={dbPost.slug} />
+
+          <div className="mt-10 rounded-xl border border-border bg-muted/20 p-5 text-center">
+            <p className="mb-2 text-sm font-medium text-foreground">Have something to share?</p>
+            <p className="mb-3 text-xs text-muted-foreground">Submit your own post and reach TinkrKit&apos;s community.</p>
+            <Link
+              href="/blog/submit"
+              className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90"
+            >
+              Submit a post →
+            </Link>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
+  // ── 2. MDX fallback (local dev / Supabase unavailable) ────────────────────
   const mdxPost = getPostBySlug(params.slug);
 
   if (mdxPost) {
@@ -245,87 +329,6 @@ export default async function BlogPostPage({
     );
   }
 
-  // ── 2. Try Supabase ────────────────────────────────────────────────────────
-  const { data: dbPost } = await supabase
-    .from("blog_posts")
-    .select("*")
-    .eq("slug", params.slug)
-    .eq("status", "approved")
-    .single<DBPost>();
-
-  if (!dbPost) notFound();
-
-  // Look up the tool name from the tools registry
-  const toolObj = TOOLS.find(
-    (t) => `/${t.category}/${t.slug}` === dbPost.related_tool
-  );
-  const toolName = toolObj?.name ?? "TinkrKit Tool";
-  const displayDate = dbPost.published_at ?? dbPost.created_at;
-
-  return (
-    <div className="flex min-h-screen flex-col">
-      <Navbar />
-      <main className="mx-auto w-full max-w-2xl flex-1 px-4 py-12 sm:px-6">
-        <Link
-          href="/blog"
-          className="mb-8 inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
-        >
-          <ArrowLeft className="h-3.5 w-3.5" /> All posts
-        </Link>
-
-        <div className="mb-8">
-          <div className="mb-3 flex flex-wrap items-center gap-3 text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
-            <span>{fmtDate(displayDate)}</span>
-            <span>·</span>
-            <span className="flex items-center gap-1"><User className="h-3 w-3" />{dbPost.author_name}</span>
-            <span>·</span>
-            <span className="flex items-center gap-1"><Clock className="h-3 w-3" />{readTime(dbPost.content)}</span>
-          </div>
-          <h1 className="text-2xl font-bold leading-snug tracking-tight sm:text-3xl">
-            {dbPost.title}
-          </h1>
-          {dbPost.description && (
-            <p className="mt-3 text-base text-muted-foreground leading-relaxed">
-              {dbPost.description}
-            </p>
-          )}
-          {dbPost.tags.length > 0 && (
-            <div className="mt-4 flex flex-wrap items-center gap-1.5">
-              <Tag className="h-3 w-3 text-muted-foreground/60" />
-              {dbPost.tags.map((tag) => (
-                <span key={tag} className="rounded-full bg-muted/60 px-2.5 py-0.5 text-xs text-muted-foreground">
-                  {tag}
-                </span>
-              ))}
-            </div>
-          )}
-        </div>
-
-        <hr className="mb-8 border-border" />
-
-        {/* Render markdown via MDXRemote (handles plain markdown fine) */}
-        <div className="prose prose-sm dark:prose-invert max-w-none">
-          <MDXRemote source={dbPost.content} options={MDX_OPTIONS} />
-        </div>
-
-        {dbPost.related_tool && (
-          <ToolCta toolPath={dbPost.related_tool} toolName={toolName} />
-        )}
-        <SocialShareButtons title={dbPost.title} slug={dbPost.slug} />
-        <RelatedPosts tags={dbPost.tags} currentSlug={dbPost.slug} />
-
-        <div className="mt-10 rounded-xl border border-border bg-muted/20 p-5 text-center">
-          <p className="mb-2 text-sm font-medium text-foreground">Have something to share?</p>
-          <p className="mb-3 text-xs text-muted-foreground">Submit your own post and reach TinkrKit&apos;s community.</p>
-          <Link
-            href="/blog/submit"
-            className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90"
-          >
-            Submit a post →
-          </Link>
-        </div>
-      </main>
-      <Footer />
-    </div>
-  );
+  // ── 3. Nothing found anywhere → 404 ──────────────────────────────────────
+  notFound();
 }
