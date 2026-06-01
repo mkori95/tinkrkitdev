@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import { getUrlInput } from "@/lib/url-input";
 import { ToolLayout } from "@/components/ToolLayout";
 import { Button } from "@/components/ui/button";
 import { TOOLS, getRelatedTools } from "@/lib/tools-config";
@@ -35,7 +36,8 @@ console.log(greet("World"));
 `;
 
 export default function MarkdownPreviewPage() {
-  const [input, setInput] = useState(SAMPLE);
+  // If extension passed ?input=, use that; otherwise show sample
+  const [input, setInput] = useState<string>(() => getUrlInput() || SAMPLE);
   const [copied, setCopied] = useState(false);
   const [view, setView] = useState<"split" | "preview" | "source">("split");
   const [sizeError, setSizeError] = useState<string | null>(null);

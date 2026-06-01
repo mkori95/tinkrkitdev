@@ -40,6 +40,71 @@
 .prose em { font-style: italic; }
 .prose img { max-width: 100%; border-radius: 8px; margin: 1em 0; }
 
+/* ── Footer tools directory — CSS multi-column newspaper flow ──────────────
+   Using plain CSS instead of Tailwind arbitrary values because column-fill
+   and the columns shorthand need reliable cross-browser support.          */
+
+.footer-tools-grid {
+  /* Mobile → 2 columns */
+  columns: 2;
+  column-gap: 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .footer-tools-grid {
+    columns: 3;
+    column-gap: 2rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .footer-tools-grid {
+    columns: 4;
+    column-gap: 2rem;
+  }
+}
+
+@media (min-width: 1280px) {
+  .footer-tools-grid {
+    columns: 5;
+    column-gap: 2rem;
+  }
+}
+
+/* Each category block stays together — heading never orphaned from its tools.
+   display:inline-block + width:100% is a widely-supported technique that
+   makes break-inside:avoid reliable across all modern browsers.          */
+.footer-category {
+  display: inline-block;
+  width: 100%;
+  break-inside: avoid;
+  page-break-inside: avoid; /* older Safari/Firefox */
+  margin-bottom: 1.75rem;
+}
+
+.footer-category-title {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: hsl(var(--foreground));
+  margin-bottom: 8px;
+}
+
+.footer-category-link {
+  display: block;
+  font-size: 12px;
+  line-height: 1.5;
+  color: hsl(var(--muted-foreground));
+  margin-bottom: 3px;
+  text-decoration: none;
+  transition: color 0.15s;
+}
+
+.footer-category-link:hover {
+  color: hsl(var(--primary));
+}
+
 @layer base {
   :root {
     --background: 0 0% 98%;

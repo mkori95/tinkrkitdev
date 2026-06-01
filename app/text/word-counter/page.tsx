@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { getUrlInput } from "@/lib/url-input";
 import { ToolLayout } from "@/components/ToolLayout";
 import { Button } from "@/components/ui/button";
 import { TOOLS, getRelatedTools } from "@/lib/tools-config";
@@ -19,8 +20,9 @@ function countStats(text: string) {
 }
 
 export default function WordCounterPage() {
-  const [input, setInput] = useState("");
-  const [stats, setStats] = useState(countStats(""));
+  // Pre-populate from ?input= (Chrome extension routes long text here)
+  const [input, setInput] = useState<string>(() => getUrlInput());
+  const [stats, setStats] = useState(() => countStats(getUrlInput()));
 
   useEffect(() => {
     setStats(countStats(input));

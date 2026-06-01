@@ -1,8 +1,42 @@
 import Link from "next/link";
-import { TOOLS, CATEGORIES } from "@/lib/tools-config";
+import { TOOLS, CATEGORIES, type Tool } from "@/lib/tools-config";
 import { SocialShare } from "./SocialShare";
 import { BuyMeCoffee } from "./BuyMeCoffee";
 import { Logo } from "./Logo";
+
+const toolsBySlug = Object.fromEntries(TOOLS.map((t) => [t.slug, t]));
+
+const FOOTER_GROUPS: { label: string; tools: Tool[] }[] = [
+  {
+    label: "JSON Tools",
+    tools: ["json-formatter", "json-validator", "json-minifier", "json-to-yaml", "json-to-xml", "json-to-csv", "json-schema"]
+      .map((s) => toolsBySlug[s]).filter(Boolean),
+  },
+  {
+    label: "XML & Markup",
+    tools: ["xml-formatter", "xml-to-json", "yaml-formatter", "markdown-preview", "html-preview"]
+      .map((s) => toolsBySlug[s]).filter(Boolean),
+  },
+  {
+    label: "Data & SQL",
+    tools: ["csv-viewer", "sql-formatter", "diff-checker"]
+      .map((s) => toolsBySlug[s]).filter(Boolean),
+  },
+  {
+    label: "Encoding & Hashing",
+    tools: ["base64", "url-encoder", "html-encoder", "hash-generator", "jwt-decoder"]
+      .map((s) => toolsBySlug[s]).filter(Boolean),
+  },
+  {
+    label: "Dev Utilities",
+    tools: ["regex-tester", "uuid-generator", "cron-builder", "timestamp-converter", "color-converter", "base-converter"]
+      .map((s) => toolsBySlug[s]).filter(Boolean),
+  },
+  ...CATEGORIES.filter((c) => c.id !== "developer").map((cat) => ({
+    label: cat.label,
+    tools: TOOLS.filter((t) => t.category === cat.id),
+  })),
+];
 
 export function Footer() {
   const year = new Date().getFullYear();
@@ -30,47 +64,23 @@ export function Footer() {
           All Tools
         </p>
 
-        <div className="grid grid-cols-2 gap-x-8 gap-y-8 md:grid-cols-4 lg:grid-cols-6">
-          {CATEGORIES.map((cat) => {
-            const catTools = TOOLS.filter((t) => t.category === cat.id);
-            return (
-              <div key={cat.id}>
-                <p className="mb-2.5 text-xs font-semibold uppercase tracking-wider text-foreground">
-                  {cat.label}
-                </p>
-                <ul className="space-y-1.5">
-                  {catTools.map((tool) => (
-                    <li key={tool.slug}>
-                      <Link
-                        href={tool.url}
-                        className="text-xs text-muted-foreground hover:text-foreground transition-colors leading-snug"
-                      >
-                        {tool.name}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            );
-          })}
-        </div>
-
-        {/* Chrome Extension teaser */}
-        <div className="mt-8 rounded-xl border border-border bg-muted/20 p-4">
-          <p className="text-sm font-medium text-foreground">
-            🧩 TinkrKit Chrome Extension
-          </p>
-          <p className="mt-1 text-xs text-muted-foreground">
-            Use TinkrKit tools directly from your browser. Right-click any text → Open in TinkrKit.
-          </p>
-          <a
-            href="https://chromewebstore.google.com/search/TinkrKit"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="mt-2 inline-flex items-center gap-1.5 rounded-md border border-indigo-500 px-3 py-1.5 text-xs font-medium text-indigo-500 hover:bg-indigo-500 hover:text-white transition-colors"
-          >
-            Add to Chrome →
-          </a>
+        {/* footer-tools-grid / footer-category defined in globals.css — plain CSS
+            columns shorthand is more reliable than Tailwind arbitrary values    */}
+        <div className="footer-tools-grid">
+          {FOOTER_GROUPS.map((group) => (
+            <div key={group.label} className="footer-category">
+              <p className="footer-category-title">{group.label}</p>
+              <ul>
+                {group.tools.map((tool) => (
+                  <li key={tool.slug}>
+                    <Link href={tool.url} className="footer-category-link">
+                      {tool.name}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
         </div>
       </div>
 

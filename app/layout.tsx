@@ -21,9 +21,12 @@ export const metadata: Metadata = {
     "Free, fast, browser-based tools for developers and everyday users. JSON formatter, image compressor, PDF tools, and more. No login. No backend. 100% private.",
   keywords: "online tools, json formatter, image compressor, pdf tools, developer tools",
   icons: {
-    icon: "/tinkrkit-icon.png",
-    shortcut: "/tinkrkit-icon.png",
-    apple: "/tinkrkit-icon.png",
+    // ?v=2 busts any browser / CDN cache of the old Vercel icon
+    icon: [
+      { url: "/tinkrkit-icon.png?v=2", type: "image/png" },
+    ],
+    shortcut: "/favicon.ico?v=2",
+    apple:    "/tinkrkit-icon.png?v=2",
   },
   openGraph: {
     title: "tinkrkit.dev — Free Online Tools",

@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { getUrlInput } from "@/lib/url-input";
 import { ToolLayout } from "@/components/ToolLayout";
 import { InputArea } from "@/components/InputArea";
 import { Button } from "@/components/ui/button";
@@ -30,8 +31,11 @@ function countKeys(obj: unknown, depth = 0): { keys: number; depth: number } {
 }
 
 export default function JsonValidatorPage() {
-  const [input, setInput] = useState("");
+  const [input, setInput] = useState<string>(() => getUrlInput());
   const [result, setResult] = useState<ValidationResult | null>(null);
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => { if (input) validate(); }, []);
 
   function validate() {
     if (!input.trim()) return;

@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { getUrlInput } from "@/lib/url-input";
 import { ToolLayout } from "@/components/ToolLayout";
 import { Button } from "@/components/ui/button";
 import { TOOLS, getRelatedTools } from "@/lib/tools-config";
@@ -75,9 +76,13 @@ function JsonBlock({ data, label }: { data: Record<string, unknown>; label: stri
 }
 
 export default function JwtDecoderPage() {
-  const [input, setInput] = useState("");
+  const [input, setInput] = useState<string>(() => getUrlInput());
   const [decoded, setDecoded] = useState<JwtParts | null>(null);
   const [error, setError] = useState("");
+
+  // Auto-decode when opened via Chrome extension (?input=...)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => { if (input) handleDecode(); }, []);
 
   function handleDecode() {
     if (!input.trim()) return;

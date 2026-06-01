@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { getUrlInput } from "@/lib/url-input";
 import { ToolLayout } from "@/components/ToolLayout";
 import { Button } from "@/components/ui/button";
 import { TOOLS, getRelatedTools } from "@/lib/tools-config";
@@ -73,8 +74,11 @@ const FORMAT_ROWS = [
 ];
 
 export default function TimestampConverterPage() {
-  // Section 1: Timestamp → Date
-  const [tsInput, setTsInput] = useState("");
+  // Section 1: Timestamp → Date — pre-populate from ?input= (extension)
+  const [tsInput, setTsInput] = useState<string>(() => getUrlInput());
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => { if (tsInput) convertTs(); }, []);
   const [tsResult, setTsResult] = useState<DateFormats | null>(null);
   const [tsError, setTsError] = useState("");
 

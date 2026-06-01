@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { getUrlInput } from "@/lib/url-input";
 import { ToolLayout } from "@/components/ToolLayout";
 import { Button } from "@/components/ui/button";
 import { TOOLS, getRelatedTools } from "@/lib/tools-config";
@@ -24,7 +25,13 @@ function escapeHtml(s: string): string {
 }
 
 export default function RegexTesterPage() {
-  const [pattern, setPattern] = useState("");
+  // ?input= from extension = regex pattern (e.g. /^[a-z]+$/g)
+  const [pattern, setPattern] = useState<string>(() => {
+    const raw = getUrlInput();
+    // Strip surrounding /…/flags if the user selected a regex literal
+    const m = raw.match(/^\/(.*)\/([gimsuy]*)$/);
+    return m ? m[1] : raw;
+  });
   const [testString, setTestString] = useState("");
   const [flags, setFlags] = useState({ g: true, i: false, m: false });
   const [matches, setMatches] = useState<Match[]>([]);
