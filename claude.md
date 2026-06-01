@@ -65,10 +65,14 @@ Blog system + admin panel backed by Supabase + Google OAuth.
 ### Components
 - [x] `Logo.tsx` — **Single source of truth.** Pure JSX, no image files. `text-foreground` "Tinkr" + `text-indigo-500` "Kit". Works in light AND dark.
 - [x] `Navbar.tsx` — Logo · Side Layout toggle (homepage only) · Blog · About · 🧩 Add to Chrome (→ Chrome Web Store) · 🌙
-- [x] `Footer.tsx` — Social strip · Full tools directory · Chrome extension teaser (→ Chrome Web Store) · Logo · legal links
+- [x] `Footer.tsx` — Social strip · Full tools directory (via `FOOTER_GROUPS` — see below) · Chrome extension teaser · Logo · legal links
 - [x] `ToolLayout.tsx` — wraps every tool; auto-renders: SocialShare → BuyMeCoffee → HowToUse → KeywordTags → RelatedTools → RelatedPosts → AdSlot
+- [x] `PanelLayout.tsx` — wraps tool input/output panels; stacked ↔ side-by-side toggle (persisted per-tool in localStorage); `items-stretch` ensures equal panel heights; both panels are `flex flex-col` so children fill height
+- [x] `InputArea.tsx` — file upload + URL load + paste; default `rows=20`, textarea is `flex-1 min-h-[20rem]` so it fills panel height in side-by-side mode; root div is `h-full flex flex-col`
+- [x] `HighlightedOutput.tsx` — JSON/XML syntax highlighting + Raw ↔ Tree toggle (when `treeData` passed); copy + download; root div `h-full flex flex-col`; content areas (`syntax-block`, TreeView, readonly textarea) are `flex-1 min-h-[20rem]` to fill panel height; `minHeight` default `28rem`
+- [x] `TreeView.tsx` — collapsible tree renderer for any parsed JS value (JSON/XML/YAML); auto-expands depth ≤ 2; accepts `className` + `style` props
 - [x] `SocialShare.tsx`, `BuyMeCoffee.tsx`, `HowToUse.tsx`, `KeywordTags.tsx`, `RelatedTools.tsx`, `RelatedPosts.tsx`
-- [x] `InputArea.tsx`, `HighlightedOutput.tsx`, `ComingSoon.tsx`, `ToolHeader.tsx`, `AdSlot.tsx`
+- [x] `ComingSoon.tsx`, `ToolHeader.tsx`, `AdSlot.tsx`
 - [x] `DarkModeToggle.tsx`, `ThemeProvider.tsx`, `CategoryPage.tsx`
 - [x] `BlogListing.tsx` — client-side search, tag filter, sort, pagination
 
@@ -88,6 +92,15 @@ Blog system + admin panel backed by Supabase + Google OAuth.
 #### Developer — 26 tools (`/developer/[slug]`)
 Phase 1: json-formatter, json-validator, json-minifier, xml-formatter, xml-to-json, json-to-xml, yaml-formatter, json-to-yaml, csv-viewer, json-to-csv, sql-formatter, markdown-preview
 Phase 3: base64, url-encoder, html-encoder, jwt-decoder, regex-tester, uuid-generator, hash-generator, cron-builder, timestamp-converter, color-converter, diff-checker, base-converter, json-schema, html-preview
+
+**PanelLayout coverage (stacked ↔ side-by-side toggle):**
+- Uses PanelLayout: json-formatter, xml-formatter, yaml-formatter, sql-formatter, csv-viewer, json-minifier, json-to-yaml, json-to-xml, xml-to-json, json-to-csv, base64, url-encoder, html-encoder
+- Custom/special UI (no PanelLayout): json-validator, markdown-preview, html-preview, jwt-decoder, regex-tester, hash-generator, cron-builder, color-converter, timestamp-converter, base-converter, diff-checker, json-schema, uuid-generator
+
+**Formatter feature parity:**
+- Raw/Tree toggle: json-formatter ✓, xml-formatter ✓, yaml-formatter ✓, xml-to-json ✓, json-minifier ✓
+- Indent selector (2/4 spaces): json-formatter ✓, xml-formatter ✓, yaml-formatter ✓, json-to-yaml ✓, json-to-xml ✓
+- Dialect selector: sql-formatter ✓ (Standard SQL / MySQL / PostgreSQL / SQLite / BigQuery)
 
 #### Image — 12 tools (`/image/[slug]`)
 image-compressor, jpg-to-png, png-to-jpg, png-to-webp, webp-to-jpg, image-resizer, image-to-base64, base64-to-image, svg-optimizer, image-metadata, svg-to-png, svg-to-jpeg
@@ -198,6 +211,8 @@ Admin approves → Supabase (status: approved, published_at: now)
 - Together these permanently prevent `ENOENT .pack.gz` errors
 
 ### Component usage pattern
+
+**Simple tool (no input/output panels):**
 ```tsx
 "use client";
 import { ToolLayout } from "@/components/ToolLayout";
@@ -213,6 +228,43 @@ export default function Page() {
   );
 }
 ```
+
+**Tool with input/output panels (preferred for all text-in/text-out tools):**
+```tsx
+"use client";
+import { ToolLayout } from "@/components/ToolLayout";
+import { PanelLayout } from "@/components/PanelLayout";
+import { InputArea } from "@/components/InputArea";
+import { HighlightedOutput } from "@/components/HighlightedOutput";
+import { TOOLS, getRelatedTools } from "@/lib/tools-config";
+
+const tool = TOOLS.find(t => t.slug === "json-formatter")!;
+
+export default function Page() {
+  return (
+    <ToolLayout tool={tool} relatedTools={getRelatedTools(tool)}>
+      <PanelLayout
+        toolSlug="json-formatter"
+        controls={<>/* action buttons, indent selectors, etc. */</>}
+        input={<InputArea value={input} onChange={setInput} label="..." />}
+        output={
+          <>
+            {error && <ErrorBanner />}
+            <HighlightedOutput value={output} language="json" label="..." treeData={parsed ?? undefined} />
+          </>
+        }
+      />
+    </ToolLayout>
+  );
+}
+```
+
+- `controls` — rendered above both panels in a flex row (left: tool buttons; right: layout toggle pill auto-added by PanelLayout)
+- `input` — left panel in side mode, top in stacked mode
+- `output` — right panel in side mode, bottom in stacked mode
+- Error banners go inside `output` prop, above HighlightedOutput
+- Pass `treeData={parsed ?? undefined}` to HighlightedOutput to enable Raw/Tree toggle
+- For indent: pass `indentVal` parameter to format function, update state + call `format(n)` on button click to avoid stale closure
 
 ToolLayout auto-renders after children (in order):
 1. SocialShare (tool variant)
@@ -261,6 +313,13 @@ const pdfDoc = await pdfjsLib.getDocument({ data: new Uint8Array(arrayBuffer) })
 4. Copy Client ID + Secret → .env.local → GOOGLE_CLIENT_ID / GOOGLE_CLIENT_SECRET
 5. Add all env vars to Vercel before deploying
 ```
+
+### Footer tools directory (FOOTER_GROUPS)
+- `components/Footer.tsx` defines `FOOTER_GROUPS` at module level — **do NOT use `CATEGORIES` directly for footer rendering**
+- Developer category is split into 5 sub-groups: JSON Tools, XML & Markup, Data & SQL, Encoding & Hashing, Dev Utilities
+- Non-developer categories (Image, Text, Math, PDF, File) are appended via `CATEGORIES.filter(c => c.id !== "developer")`
+- When adding a new developer tool to the footer, add its slug to the appropriate sub-group in `FOOTER_GROUPS`; non-developer tools appear automatically
+- CSS: 2 columns mobile → 3 tablet (768px) → 4 desktop (1024px) → 5 wide (1280px); defined in `app/globals.css` as `.footer-tools-grid`
 
 ### Vercel env vars required
 All vars from `.env.local` must be added to Vercel dashboard:

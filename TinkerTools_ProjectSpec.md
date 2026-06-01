@@ -133,8 +133,8 @@ PDF tools. Developer tools. Image tools. File converters. All in one place. Clea
 - [x] Dark/light mode (custom ThemeProvider — NOT next-themes)
 - [x] `Logo.tsx` — pure JSX logo, no image files (Navbar + Footer), light+dark compatible
 - [x] `Navbar.tsx` — JSX logo · Side Layout toggle · Blog · About · 🧩 Add to Chrome (waitlist modal) · 🌙
-- [x] `Footer.tsx` — support strip · full tools directory (6 cats) · Chrome extension teaser · JSX logo
-- [x] Reusable components: ToolLayout (with SocialShare+BuyMeCoffee+HowToUse), InputArea, HighlightedOutput, ComingSoon, ToolHeader, AdSlot, KeywordTags, RelatedTools, RelatedPosts, SocialShare, BuyMeCoffee, HowToUse
+- [x] `Footer.tsx` — support strip · tools directory (Developer split into 5 sub-groups via `FOOTER_GROUPS`) · Chrome extension teaser · JSX logo; CSS: 2→3→4→5 columns across breakpoints
+- [x] Reusable components: ToolLayout, PanelLayout (stacked↔side-by-side toggle, equal-height panels), InputArea, HighlightedOutput (Raw/Tree toggle, syntax highlight), TreeView, ComingSoon, ToolHeader, AdSlot, KeywordTags, RelatedTools, RelatedPosts, SocialShare, BuyMeCoffee, HowToUse
 - [x] AdSlot placeholder components (sidebar desktop + below-output mobile)
 - [x] `robots.txt`
 - [x] `restart.sh` — kills port 3000, clears .next, starts dev
@@ -323,7 +323,7 @@ PDF tools. Developer tools. Image tools. File converters. All in one place. Clea
 - [x] Chrome Extension Manifest V3 — popup, search, all 64 tools (`/chrome-extension/`)
 - [x] Logo — pure JSX component (`Logo.tsx`), no image files in rendered UI
 - [x] Navbar — JSX logo · Side Layout · Blog · About · 🧩 Add to Chrome · 🌙
-- [x] Footer — full 64-tool directory · support strip · Chrome teaser · JSX logo
+- [x] Footer — 64-tool directory via `FOOTER_GROUPS` (Developer split into 5 sub-groups) · 5-column responsive grid · support strip · Chrome teaser · JSX logo
 - [x] Favicon (`tinkrkit-icon.png`) + OG image (`tinkrkit-og.png`) in layout.tsx metadata
 - [x] Blog — 5 SEO posts live in `/content/blog/`
 - [x] Static pages — About, Privacy, Terms, Contact, Content Policy
@@ -338,6 +338,9 @@ PDF tools. Developer tools. Image tools. File converters. All in one place. Clea
 - [x] `robots.txt`
 - [x] webpack memory cache fix (no more ENOENT .pack.gz errors)
 - [x] Self-healing `npm run dev` script
+- [x] PanelLayout — stacked ↔ side-by-side toggle on 13 developer tools; equal-height panels via `items-stretch` + `flex flex-col` + `flex-1` fill
+- [x] Raw/Tree toggle on: json-formatter, xml-formatter, yaml-formatter, xml-to-json, json-minifier
+- [x] Indent selector (2/4 spaces) on: json-formatter, xml-formatter, yaml-formatter, json-to-yaml, json-to-xml
 
 ### ⏳ PENDING — Must do before launch
 - [ ] **Deploy to Vercel** — `vercel --prod`
@@ -403,11 +406,13 @@ tinkrkitdev/
 ├── components/
 │   ├── Logo.tsx                    # Shared logo — pure JSX, no image files (Navbar + Footer)
 │   ├── ToolLayout.tsx              # Tool wrapper (SocialShare+BuyMeCoffee+HowToUse+tags+related+ads)
+│   ├── PanelLayout.tsx             # Input/output panel wrapper — stacked↔side-by-side toggle, equal heights
 │   ├── SocialShare.tsx             # variants: tool | footer | homepage
 │   ├── BuyMeCoffee.tsx             # variants: inline | footer
 │   ├── HowToUse.tsx                # Auto-generates steps from tool.category
-│   ├── InputArea.tsx
-│   ├── HighlightedOutput.tsx
+│   ├── InputArea.tsx               # File upload + URL load + paste; flex-1 fills panel height
+│   ├── HighlightedOutput.tsx       # Syntax highlight + Raw/Tree toggle + copy/download; flex-1 fills panel
+│   ├── TreeView.tsx                # Collapsible tree for parsed JSON/XML/YAML values
 │   ├── ComingSoon.tsx
 │   ├── ToolHeader.tsx
 │   ├── AdSlot.tsx
@@ -415,7 +420,7 @@ tinkrkitdev/
 │   ├── RelatedTools.tsx
 │   ├── RelatedPosts.tsx
 │   ├── Navbar.tsx
-│   ├── Footer.tsx
+│   ├── Footer.tsx                  # Uses FOOTER_GROUPS — Developer split into 5 sub-groups
 │   ├── DarkModeToggle.tsx
 │   ├── ThemeProvider.tsx
 │   └── CategoryPage.tsx
@@ -435,5 +440,5 @@ tinkrkitdev/
 └── package.json
 ```
 
-*Version: 3.3 — Last Updated: May 2026*
-*Status: 64 tools ✅ · Chrome Extension v1.0 ✅ · JSX logo ✅ · webpack fix ✅ · Deployment pending.*
+*Version: 3.4 — Last Updated: May 2026*
+*Status: 64 tools ✅ · PanelLayout on 13 dev tools ✅ · Footer 5-column FOOTER_GROUPS ✅ · Formatter feature parity ✅ · Chrome Extension v1.0 ✅ · Deployment pending.*
