@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "TinkrKit",
   "short_name": "TinkrKit",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Every tool you need, right in your browser. JSON formatter, image compressor, file converter and 60+ more tools.",
   "icons": {
     "16": "icons/icon16.png",
@@ -20,7 +20,7 @@
       "128": "icons/icon128.png"
     }
   },
-  "permissions": ["storage", "tabs", "contextMenus"],
+  "permissions": ["storage", "contextMenus"],
   "background": {
     "service_worker": "background.js"
   }
