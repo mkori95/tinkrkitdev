@@ -38,11 +38,11 @@ export async function POST(req: NextRequest) {
   // ── 3. Send via Resend ────────────────────────────────────────────────────────
   const resend = new Resend(process.env.RESEND_API_KEY);
 
-  const toAddress = process.env.ADMIN_EMAIL || "support@tinkrkit.dev";
+  const toAddress = "support@tinkrkit.dev";
 
-  // FROM: use onboarding@resend.dev until tinkrkit.dev is verified in Resend dashboard.
-  // Once verified, change to: "TinkrKit Contact <contact@tinkrkit.dev>"
-  const fromAddress = "TinkrKit Contact <onboarding@resend.dev>";
+  // Requires tinkrkit.dev to be verified in Resend dashboard.
+  // If you see a "domain not verified" error, verify it at resend.com/domains first.
+  const fromAddress = "TinkrKit <support@tinkrkit.dev>";
 
   console.log("[contact] Sending email → from:", fromAddress, "| to:", toAddress);
 
