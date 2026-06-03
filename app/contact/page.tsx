@@ -18,17 +18,10 @@ export default function ContactPage() {
     e.preventDefault();
     setStatus("sending");
     try {
-      // Using Formspree — replace YOUR_FORM_ID after signing up at formspree.io
-      // with your support@tinkrkit.dev address to receive submissions.
-      const res = await fetch("https://formspree.io/f/xpwzqjbn", {
+      const res = await fetch("/api/contact", {
         method: "POST",
-        headers: { "Content-Type": "application/json", Accept: "application/json" },
-        body: JSON.stringify({
-          name: form.name,
-          email: form.email,
-          subject: form.subject,
-          message: form.message,
-        }),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
       });
       if (res.ok) {
         setStatus("success");
