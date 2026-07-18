@@ -166,12 +166,37 @@ export const TOOLS: Tool[] = [
     popular: true,
   },
   {
+    name: "SQL Dialect Converter",
+    slug: "sql-dialect-converter",
+    category: "developer",
+    url: "/developer/sql-dialect-converter",
+    description: "Convert SQL between MySQL, PostgreSQL, SQLite, SQL Server and BigQuery",
+    keywords: ["sql dialect", "mysql to postgresql", "sql converter", "convert sql", "postgresql to mysql", "sqlite to mysql", "sql server tsql", "bigquery sql"],
+    popular: true,
+  },
+  {
     name: "Markdown Preview",
     slug: "markdown-preview",
     category: "developer",
     url: "/developer/markdown-preview",
     description: "Preview Markdown with live rendering",
     keywords: ["markdown preview", "markdown viewer", "markdown editor", "md preview"],
+  },
+  {
+    name: "Markdown to HTML",
+    slug: "markdown-to-html",
+    category: "developer",
+    url: "/developer/markdown-to-html",
+    description: "Convert Markdown to HTML source code",
+    keywords: ["markdown to html", "md to html", "markdown converter", "markdown export html"],
+  },
+  {
+    name: "HTML to Markdown",
+    slug: "html-to-markdown",
+    category: "developer",
+    url: "/developer/html-to-markdown",
+    description: "Convert HTML to Markdown format",
+    keywords: ["html to markdown", "html to md", "convert html markdown", "html markdown converter"],
   },
 
   // ─── Developer — Phase 3 ───────────────────────────────────────────────────
