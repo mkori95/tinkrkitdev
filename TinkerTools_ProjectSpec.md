@@ -64,6 +64,7 @@ PDF tools. Developer tools. Image tools. File converters. All in one place. Clea
 | diff | Text diff comparison |
 | crypto-js | MD5, SHA1, SHA256, SHA512 hashing |
 | cronstrue | Cron expression → human-readable description |
+| heic2any | HEIC/HEIF → JPG/PNG decoding (browser-side, dynamic import) |
 
 ---
 
@@ -106,7 +107,7 @@ PDF tools. Developer tools. Image tools. File converters. All in one place. Clea
 /content-policy
 /privacy
 /terms
-/sitemap.xml       ← ✅ live via app/sitemap.ts (64 tools + blog posts, hourly revalidation)
+/sitemap.xml       ← ✅ live via app/sitemap.ts (68 tools + blog posts, hourly revalidation)
 ```
 
 ---
@@ -182,7 +183,7 @@ PDF tools. Developer tools. Image tools. File converters. All in one place. Clea
 
 ---
 
-## ✅ Phase 2 — Image Tools — COMPLETE (12/12)
+## ✅ Phase 2 — Image Tools — COMPLETE (16/16)
 
 | Tool | URL | Status |
 |---|---|---|
@@ -198,6 +199,10 @@ PDF tools. Developer tools. Image tools. File converters. All in one place. Clea
 | Image Metadata Viewer | /image/image-metadata | ✅ Built |
 | SVG to PNG | /image/svg-to-png | ✅ Built |
 | SVG to JPEG | /image/svg-to-jpeg | ✅ Built |
+| HEIC to JPG | /image/heic-to-jpg | ✅ Built |
+| HEIC to PNG | /image/heic-to-png | ✅ Built |
+| JPG to HEIC | /image/jpg-to-heic | ✅ Built |
+| PNG to HEIC | /image/png-to-heic | ✅ Built |
 
 ### PDF Tools — 3/3 ✅
 
@@ -317,23 +322,23 @@ PDF tools. Developer tools. Image tools. File converters. All in one place. Clea
 |---|---|---|---|
 | Developer (Phase 1) | 12 | 0 | 12 |
 | Developer Utilities (Phase 3) | 14 | 0 | 14 |
-| Image (Phase 2) | 12 | 0 | 12 |
+| Image (Phase 2) | 16 | 0 | 16 |
 | Text (Phase 3) | 11 | 0 | 11 |
 | Math (Phase 3) | 7 | 0 | 7 |
 | PDF (Phase 4) | 3 | 0 | 3 |
 | File (Phase 4) | 5 | 0 | 5 |
-| **Total** | **64** | **0** | **64** |
+| **Total** | **68** | **0** | **68** |
 
 ---
 
 ## 📋 Launch Checklist
 
 ### ✅ BUILT — Code complete
-- [x] 64 fully working browser-based tools (Phases 1–4)
-- [x] Chrome Extension v1.0.1 Manifest V3 — popup, search, all 64 tools, context menu; permissions: `storage`, `contextMenus` (`tabs` removed — was causing Web Store rejection)
+- [x] 68 fully working browser-based tools (Phases 1–4)
+- [x] Chrome Extension v1.0.2 Manifest V3 — popup, search, all 68 tools, context menu; permissions: `storage`, `contextMenus` (`tabs` removed — was causing Web Store rejection)
 - [x] Logo — pure JSX component (`Logo.tsx`), no image files in rendered UI
 - [x] Navbar — JSX logo · Side Layout · Blog · About · 🧩 Add to Chrome · 🌙
-- [x] Footer — 64-tool directory via `FOOTER_GROUPS` (Developer split into 5 sub-groups) · 5-column responsive grid · support strip · Chrome teaser · JSX logo
+- [x] Footer — 68-tool directory via `FOOTER_GROUPS` (Developer split into 5 sub-groups) · 5-column responsive grid · support strip · Chrome teaser · JSX logo
 - [x] Favicon (`tinkrkit-icon.png`) + OG image (`tinkrkit-og.png`) in layout.tsx metadata
 - [x] Blog — 5 SEO posts live in `/content/blog/`
 - [x] Static pages — About, Privacy, Terms, Contact, Content Policy
@@ -348,7 +353,7 @@ PDF tools. Developer tools. Image tools. File converters. All in one place. Clea
 - [x] Ad blocker banner on homepage
 - [x] Chrome Extension teaser — footer + About page + Navbar modal
 - [x] `app/robots.ts` — `/robots.txt` via Next.js Metadata API
-- [x] `app/sitemap.ts` — dynamic sitemap with 64 tools + blog posts, hourly revalidation
+- [x] `app/sitemap.ts` — dynamic sitemap with 68 tools + blog posts, hourly revalidation
 - [x] webpack memory cache fix (no more ENOENT .pack.gz errors)
 - [x] Self-healing `npm run dev` script
 - [x] PanelLayout — stacked ↔ side-by-side toggle on 13 developer tools; equal-height panels via `items-stretch` + `flex flex-col` + `flex-1` fill
@@ -366,7 +371,7 @@ PDF tools. Developer tools. Image tools. File converters. All in one place. Clea
 - [ ] **Google Analytics** — add GA4 `measurementId` to `app/layout.tsx`
 - [ ] **Submit sitemap.xml** — submit `tinkrkit.dev/sitemap.xml` to Google Search Console after domain is live (`app/sitemap.ts` is already built)
 - [ ] **Google AdSense** — apply after launch, then replace AdSlot placeholders with live ad code
-- [ ] **Resubmit Chrome Extension v1.0.1** — repackage `chrome-extension/` as zip and resubmit to Chrome Web Store (tabs permission removed; awaiting review)
+- [ ] **Resubmit Chrome Extension v1.0.2** — repackage `chrome-extension/` as zip (already done: `tinkrkit-extension.zip`) and resubmit to Chrome Web Store (v1.0.2 adds 4 HEIC tools; 68 tools total)
 - [ ] **Mobile testing** — iPhone + Android
 - [ ] **Lighthouse** — target 90+ score
 
@@ -401,7 +406,7 @@ tinkrkitdev/
 │   ├── sitemap.ts                  # Dynamic /sitemap.xml — 64 tools + blog; hourly revalidation
 │   ├── robots.ts                   # /robots.txt via Next.js Metadata API
 │   ├── developer/                  # 26 tools (Phase 1 + Phase 3) ✅
-│   ├── image/                      # 12 tools (Phase 2 + SVG to PNG/JPEG) ✅
+│   ├── image/                      # 16 tools (Phase 2 + SVG to PNG/JPEG + 4 HEIC) ✅
 │   ├── text/                       # 11 tools (Phase 3) ✅
 │   ├── math/                       # 7 tools (Phase 3) ✅
 │   ├── pdf/                        # 3 tools (pdfjs-dist@5.7.284) ✅
@@ -425,7 +430,7 @@ tinkrkitdev/
 │   ├── privacy/
 │   └── terms/
 ├── chrome-extension/               # Manifest V3 extension — standalone, not part of Next.js build
-│   ├── manifest.json               # v1.0.1; permissions: storage, contextMenus (tabs removed)
+│   ├── manifest.json               # v1.0.2; permissions: storage, contextMenus (tabs removed); 68 tools
 │   ├── popup.html / popup.js / popup.css
 │   ├── background.js               # Active service worker; "Open in TinkrKit" context menu; auto-detects 10 formats
 │   ├── content_script.js           # Phase 2 content bridge (commented out — not needed yet)
@@ -456,7 +461,7 @@ tinkrkitdev/
 ├── contexts/
 │   └── LayoutContext.tsx           # Side layout + favorites (localStorage)
 ├── lib/
-│   ├── tools-config.ts             # All 64 tools' metadata (TOOLS array + helpers)
+│   ├── tools-config.ts             # All 68 tools' metadata (TOOLS array + helpers)
 │   ├── supabase.ts                 # anon client (browser-safe) + createAdminSupabase() (service role, server-only)
 │   ├── auth-options.ts             # NextAuth v4 config; GoogleProvider; JWT strategy; ADMIN_EMAIL guard
 │   ├── blog.ts                     # Server: reads MDX files (fallback only)
@@ -480,5 +485,5 @@ tinkrkitdev/
 └── package.json
 ```
 
-*Version: 3.6 — Last Updated: July 2026*
-*Status: 64 tools ✅ · PanelLayout on 13 dev tools ✅ · Footer 5-column FOOTER_GROUPS ✅ · Formatter feature parity ✅ · Chrome Extension v1.0.1 ✅ · Supabase blog + admin panel ✅ · Contact form via Resend ✅ · Sitemap + robots.ts ✅ · Favicon fixed ✅ · PayPal support (paypal.me/tinkrkitdev) ✅ · Social accounts live (@tinkrkitdev) ✅ · Twitter Card metadata ✅ · Deployment pending.*
+*Version: 3.7 — Last Updated: July 2026*
+*Status: 68 tools ✅ · 4 HEIC tools (heic-to-jpg, heic-to-png, jpg-to-heic, png-to-heic) ✅ · PanelLayout on 13 dev tools ✅ · Footer 5-column FOOTER_GROUPS ✅ · Formatter feature parity ✅ · Chrome Extension v1.0.2 (68 tools) ✅ · Supabase blog + admin panel ✅ · Contact form via Resend ✅ · Sitemap + robots.ts ✅ · Favicon fixed ✅ · PayPal support (paypal.me/tinkrkitdev) ✅ · Social accounts live (@tinkrkitdev) ✅ · Twitter Card metadata ✅ · Deployment pending.*
