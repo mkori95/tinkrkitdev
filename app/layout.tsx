@@ -48,6 +48,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
+    site: "@tinkrkitdev",
+    creator: "@tinkrkitdev",
     title: "tinkrkit.dev — Free Online Tools",
     description: "Free browser-based tools for developers and everyday users.",
     images: ["/tinkrkit-og.png"],

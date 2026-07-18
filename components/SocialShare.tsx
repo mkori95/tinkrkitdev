@@ -19,16 +19,16 @@ export function SocialShare({ variant = "tool", title = "tinkrkit.dev — Free O
   if (variant === "footer") {
     return (
       <div className="flex items-center gap-3">
-        <a href="https://twitter.com/tinkrkitdev" target="_blank" rel="noopener noreferrer" aria-label="Twitter / X" className="text-muted-foreground hover:text-foreground transition-colors">
+        <a href="https://x.com/tinkrkitdev" target="_blank" rel="noopener noreferrer" aria-label="Twitter / X" className="text-muted-foreground hover:text-foreground transition-colors">
           <TwitterIcon />
         </a>
-        <a href="https://linkedin.com/company/tinkrkit" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" className="text-muted-foreground hover:text-foreground transition-colors">
+        <a href="https://www.linkedin.com/company/tinkrkitdev" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" className="text-muted-foreground hover:text-foreground transition-colors">
           <LinkedInIcon />
         </a>
-        <a href="https://facebook.com/tinkrkit" target="_blank" rel="noopener noreferrer" aria-label="Facebook" className="text-muted-foreground hover:text-foreground transition-colors">
+        <a href="https://www.facebook.com/profile.php?id=61592158346256" target="_blank" rel="noopener noreferrer" aria-label="Facebook" className="text-muted-foreground hover:text-foreground transition-colors">
           <FacebookIcon />
         </a>
-        <a href="https://instagram.com/tinkrkit" target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="text-muted-foreground hover:text-foreground transition-colors">
+        <a href="https://www.instagram.com/tinkrkitdev/" target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="text-muted-foreground hover:text-foreground transition-colors">
           <InstagramIcon />
         </a>
       </div>
