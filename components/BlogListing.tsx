@@ -7,7 +7,7 @@ import {
   BookOpen, ArrowRight, Tag, Search, X, ChevronLeft, ChevronRight, PenLine,
 } from "lucide-react";
 
-const PAGE_SIZE = 10;
+const PAGE_SIZE = 5;
 
 type SortMode = "latest" | "oldest" | "relevant";
 
@@ -211,21 +211,57 @@ export function BlogListing({
 
       {/* ── Pagination ──────────────────────────────────────────────────── */}
       {totalPages > 1 && (
-        <div className="mt-8 flex items-center justify-center gap-2">
+        <div className="mt-8 flex items-center justify-center gap-1.5">
+          {/* Prev */}
           <button
             onClick={() => setPage((p) => Math.max(1, p - 1))}
             disabled={safePage === 1}
-            className="flex items-center gap-1 rounded-lg border border-border px-3 py-2 text-sm text-muted-foreground hover:bg-accent disabled:opacity-40 transition-colors"
+            className="flex h-8 w-8 items-center justify-center rounded-lg border border-border text-muted-foreground hover:bg-accent disabled:opacity-40 transition-colors"
+            aria-label="Previous page"
           >
             <ChevronLeft className="h-4 w-4" />
           </button>
-          <span className="text-sm text-muted-foreground">
-            Page {safePage} of {totalPages}
-          </span>
+
+          {/* Page number buttons */}
+          {Array.from({ length: totalPages }, (_, i) => i + 1).map((n) => {
+            // Always show first, last, current, and 1 neighbour each side
+            const show =
+              n === 1 ||
+              n === totalPages ||
+              Math.abs(n - safePage) <= 1;
+            // Show ellipsis slot instead of hidden pages
+            const showEllipsisBefore = n === safePage - 2 && safePage - 2 > 1;
+            const showEllipsisAfter  = n === safePage + 2 && safePage + 2 < totalPages;
+
+            if (!show && !showEllipsisBefore && !showEllipsisAfter) return null;
+            if (showEllipsisBefore || showEllipsisAfter) {
+              return (
+                <span key={`ellipsis-${n}`} className="flex h-8 w-8 items-center justify-center text-sm text-muted-foreground">
+                  …
+                </span>
+              );
+            }
+            return (
+              <button
+                key={n}
+                onClick={() => setPage(n)}
+                className={`flex h-8 w-8 items-center justify-center rounded-lg text-sm font-medium transition-colors ${
+                  safePage === n
+                    ? "bg-primary text-primary-foreground"
+                    : "border border-border text-muted-foreground hover:bg-accent"
+                }`}
+              >
+                {n}
+              </button>
+            );
+          })}
+
+          {/* Next */}
           <button
             onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
             disabled={safePage === totalPages}
-            className="flex items-center gap-1 rounded-lg border border-border px-3 py-2 text-sm text-muted-foreground hover:bg-accent disabled:opacity-40 transition-colors"
+            className="flex h-8 w-8 items-center justify-center rounded-lg border border-border text-muted-foreground hover:bg-accent disabled:opacity-40 transition-colors"
+            aria-label="Next page"
           >
             <ChevronRight className="h-4 w-4" />
           </button>
