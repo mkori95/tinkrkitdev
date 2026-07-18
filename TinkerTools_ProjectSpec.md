@@ -226,7 +226,7 @@ PDF tools. Developer tools. Image tools. File converters. All in one place. Clea
 
 ## ✅ Phase 3 — Dev Utilities + Text + Math — COMPLETE (32/32)
 
-### Developer Utilities — 14/14 ✅
+### Developer Utilities — 17/17 ✅
 
 | Tool | URL | Status |
 |---|---|---|
@@ -244,6 +244,9 @@ PDF tools. Developer tools. Image tools. File converters. All in one place. Clea
 | Number Base Converter | /developer/base-converter | ✅ Built |
 | JSON Schema Validator | /developer/json-schema | ✅ Built |
 | HTML Preview | /developer/html-preview | ✅ Built |
+| SQL Dialect Converter | /developer/sql-dialect-converter | ✅ Built |
+| Markdown to HTML | /developer/markdown-to-html | ✅ Built |
+| HTML to Markdown | /developer/html-to-markdown | ✅ Built |
 
 ### Text Tools — 11/11 ✅
 
@@ -321,21 +324,21 @@ PDF tools. Developer tools. Image tools. File converters. All in one place. Clea
 | Category | Built | ComingSoon | Total |
 |---|---|---|---|
 | Developer (Phase 1) | 12 | 0 | 12 |
-| Developer Utilities (Phase 3) | 14 | 0 | 14 |
+| Developer Utilities (Phase 3) | 17 | 0 | 17 |
 | Image (Phase 2) | 16 | 0 | 16 |
 | Text (Phase 3) | 11 | 0 | 11 |
 | Math (Phase 3) | 7 | 0 | 7 |
 | PDF (Phase 4) | 3 | 0 | 3 |
 | File (Phase 4) | 5 | 0 | 5 |
-| **Total** | **68** | **0** | **68** |
+| **Total** | **71** | **0** | **71** |
 
 ---
 
 ## 📋 Launch Checklist
 
 ### ✅ BUILT — Code complete
-- [x] 68 fully working browser-based tools (Phases 1–4)
-- [x] Chrome Extension v1.0.2 Manifest V3 — popup, search, all 68 tools, context menu; permissions: `storage`, `contextMenus` (`tabs` removed — was causing Web Store rejection)
+- [x] 71 fully working browser-based tools (Phases 1–4)
+- [x] Chrome Extension v1.0.3 Manifest V3 — popup, search, all 71 tools, context menu; permissions: `storage`, `contextMenus` (`tabs` removed — was causing Web Store rejection)
 - [x] Logo — pure JSX component (`Logo.tsx`), no image files in rendered UI
 - [x] Navbar — JSX logo · Side Layout · Blog · About · 🧩 Add to Chrome · 🌙
 - [x] Footer — 68-tool directory via `FOOTER_GROUPS` (Developer split into 5 sub-groups) · 5-column responsive grid · support strip · Chrome teaser · JSX logo
@@ -371,7 +374,7 @@ PDF tools. Developer tools. Image tools. File converters. All in one place. Clea
 - [ ] **Google Analytics** — add GA4 `measurementId` to `app/layout.tsx`
 - [ ] **Submit sitemap.xml** — submit `tinkrkit.dev/sitemap.xml` to Google Search Console after domain is live (`app/sitemap.ts` is already built)
 - [ ] **Google AdSense** — apply after launch, then replace AdSlot placeholders with live ad code
-- [ ] **Resubmit Chrome Extension v1.0.2** — repackage `chrome-extension/` as zip (already done: `tinkrkit-extension.zip`) and resubmit to Chrome Web Store (v1.0.2 adds 4 HEIC tools; 68 tools total)
+- [ ] **Resubmit Chrome Extension v1.0.3** — repackage `chrome-extension/` as zip (already done: `tinkrkit-extension.zip`) and resubmit to Chrome Web Store (v1.0.3 adds SQL Dialect Converter, Markdown→HTML, HTML→Markdown; 71 tools total)
 - [ ] **Mobile testing** — iPhone + Android
 - [ ] **Lighthouse** — target 90+ score
 
@@ -403,9 +406,9 @@ tinkrkitdev/
 │   ├── page.tsx                    # Homepage
 │   ├── layout.tsx                  # Root (ThemeProvider + LayoutProvider + metadata)
 │   ├── favicon.ico                 # ✅ Correct tinkrkit icon (Next.js App Router priority)
-│   ├── sitemap.ts                  # Dynamic /sitemap.xml — 64 tools + blog; hourly revalidation
+│   ├── sitemap.ts                  # Dynamic /sitemap.xml — 71 tools + blog; hourly revalidation
 │   ├── robots.ts                   # /robots.txt via Next.js Metadata API
-│   ├── developer/                  # 26 tools (Phase 1 + Phase 3) ✅
+│   ├── developer/                  # 29 tools (Phase 1 + Phase 3) ✅
 │   ├── image/                      # 16 tools (Phase 2 + SVG to PNG/JPEG + 4 HEIC) ✅
 │   ├── text/                       # 11 tools (Phase 3) ✅
 │   ├── math/                       # 7 tools (Phase 3) ✅
@@ -430,7 +433,7 @@ tinkrkitdev/
 │   ├── privacy/
 │   └── terms/
 ├── chrome-extension/               # Manifest V3 extension — standalone, not part of Next.js build
-│   ├── manifest.json               # v1.0.2; permissions: storage, contextMenus (tabs removed); 68 tools
+│   ├── manifest.json               # v1.0.3; permissions: storage, contextMenus (tabs removed); 71 tools
 │   ├── popup.html / popup.js / popup.css
 │   ├── background.js               # Active service worker; "Open in TinkrKit" context menu; auto-detects 10 formats
 │   ├── content_script.js           # Phase 2 content bridge (commented out — not needed yet)
@@ -461,7 +464,7 @@ tinkrkitdev/
 ├── contexts/
 │   └── LayoutContext.tsx           # Side layout + favorites (localStorage)
 ├── lib/
-│   ├── tools-config.ts             # All 68 tools' metadata (TOOLS array + helpers)
+│   ├── tools-config.ts             # All 71 tools' metadata (TOOLS array + helpers)
 │   ├── supabase.ts                 # anon client (browser-safe) + createAdminSupabase() (service role, server-only)
 │   ├── auth-options.ts             # NextAuth v4 config; GoogleProvider; JWT strategy; ADMIN_EMAIL guard
 │   ├── blog.ts                     # Server: reads MDX files (fallback only)
@@ -485,5 +488,5 @@ tinkrkitdev/
 └── package.json
 ```
 
-*Version: 3.7 — Last Updated: July 2026*
-*Status: 68 tools ✅ · 4 HEIC tools (heic-to-jpg, heic-to-png, jpg-to-heic, png-to-heic) ✅ · PanelLayout on 13 dev tools ✅ · Footer 5-column FOOTER_GROUPS ✅ · Formatter feature parity ✅ · Chrome Extension v1.0.2 (68 tools) ✅ · Supabase blog + admin panel ✅ · Contact form via Resend ✅ · Sitemap + robots.ts ✅ · Favicon fixed ✅ · PayPal support (paypal.me/tinkrkitdev) ✅ · Social accounts live (@tinkrkitdev) ✅ · Twitter Card metadata ✅ · Deployment pending.*
+*Version: 3.8 — Last Updated: July 2026*
+*Status: 71 tools ✅ · SQL Dialect Converter (MySQL/PostgreSQL/SQLite/SQL Server/BigQuery) ✅ · Markdown→HTML ✅ · HTML→Markdown ✅ · 4 HEIC tools ✅ · PanelLayout on 13 dev tools ✅ · Footer 5-column FOOTER_GROUPS ✅ · Chrome Extension v1.0.3 (71 tools) ✅ · Supabase blog + admin panel ✅ · Contact form via Resend ✅ · Sitemap + robots.ts ✅ · PayPal support (paypal.me/tinkrkitdev) ✅ · Social accounts live (@tinkrkitdev) ✅ · Twitter Card metadata ✅ · Deployment pending.*
