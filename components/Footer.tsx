@@ -14,12 +14,12 @@ const FOOTER_GROUPS: { label: string; tools: Tool[] }[] = [
   },
   {
     label: "XML & Markup",
-    tools: ["xml-formatter", "xml-to-json", "yaml-formatter", "markdown-preview", "html-preview"]
+    tools: ["xml-formatter", "xml-to-json", "yaml-formatter", "markdown-preview", "markdown-to-html", "html-to-markdown", "html-preview"]
       .map((s) => toolsBySlug[s]).filter(Boolean),
   },
   {
     label: "Data & SQL",
-    tools: ["csv-viewer", "sql-formatter", "diff-checker"]
+    tools: ["csv-viewer", "sql-formatter", "sql-dialect-converter", "diff-checker"]
       .map((s) => toolsBySlug[s]).filter(Boolean),
   },
   {
