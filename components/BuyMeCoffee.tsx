@@ -5,7 +5,7 @@ interface BuyMeCoffeeProps {
 }
 
 export function BuyMeCoffee({ variant = "inline" }: BuyMeCoffeeProps) {
-  const href = "https://buymeacoffee.com/tinkrkit";
+  const href = "https://paypal.me/tinkrkitdev";
 
   if (variant === "footer") {
     return (
@@ -13,9 +13,9 @@ export function BuyMeCoffee({ variant = "inline" }: BuyMeCoffeeProps) {
         href={href}
         target="_blank"
         rel="noopener noreferrer"
-        className="inline-flex items-center gap-2 rounded-md bg-[#FFDD00] px-3 py-1.5 text-xs font-semibold text-[#000000] hover:bg-[#FFDD00]/90 transition-colors"
+        className="inline-flex items-center gap-2 rounded-md bg-[#003087] px-3 py-1.5 text-xs font-semibold text-white hover:bg-[#00257a] transition-colors"
       >
-        <span>☕</span> Buy us a coffee
+        <span>💙</span> Tip via PayPal
       </Link>
     );
   }
@@ -26,9 +26,9 @@ export function BuyMeCoffee({ variant = "inline" }: BuyMeCoffeeProps) {
         href={href}
         target="_blank"
         rel="noopener noreferrer"
-        className="inline-flex items-center gap-2 rounded-md bg-[#FFDD00] px-4 py-2 text-sm font-semibold text-[#000000] hover:bg-[#FFDD00]/90 transition-colors shadow-sm"
+        className="inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:bg-primary/90 transition-colors shadow-sm"
       >
-        <span>☕</span> Buy me a coffee
+        <span>❤️</span> Support TinkrKit
       </Link>
     </div>
   );

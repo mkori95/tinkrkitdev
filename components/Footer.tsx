@@ -49,7 +49,7 @@ export function Footer() {
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 px-4 py-5 text-sm sm:flex-row sm:px-6">
           <p className="text-center text-muted-foreground sm:text-left">
             <span className="font-semibold text-foreground">Support TinkrKit</span>
-            {" "}— free forever, share it or buy us a coffee ☕
+            {" "}— free forever, share it or tip us on PayPal 💙
           </p>
           <div className="flex flex-wrap items-center justify-center gap-3">
             <SocialShare variant="footer" />

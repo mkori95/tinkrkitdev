@@ -80,7 +80,7 @@ export default function AboutPage() {
           <div className="rounded-xl border border-border bg-muted/20 p-5 pt-4">
             <p className="mb-1 text-sm font-semibold text-foreground">Support TinkrKit</p>
             <p className="mb-3 text-sm text-muted-foreground">
-              TinkrKit is free and always will be. If it&apos;s saved you time, consider buying us a coffee — it helps keep the lights on.
+              TinkrKit is free and always will be. If it&apos;s saved you time, consider supporting us via PayPal — it helps keep the lights on.
             </p>
             <BuyMeCoffee variant="inline" />
           </div>
