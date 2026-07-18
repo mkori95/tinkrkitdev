@@ -49,6 +49,10 @@ const TOOLS = [
   { name: "Image Metadata Viewer",    url: "/image/image-metadata",            icon: "ℹ️", category: "image" },
   { name: "SVG to PNG",               url: "/image/svg-to-png",                icon: "🖼️", category: "image" },
   { name: "SVG to JPEG",              url: "/image/svg-to-jpeg",               icon: "🖼️", category: "image" },
+  { name: "HEIC to JPG",              url: "/image/heic-to-jpg",               icon: "📱", category: "image" },
+  { name: "HEIC to PNG",              url: "/image/heic-to-png",               icon: "📱", category: "image" },
+  { name: "JPG to HEIC",              url: "/image/jpg-to-heic",               icon: "🍎", category: "image" },
+  { name: "PNG to HEIC",              url: "/image/png-to-heic",               icon: "🍎", category: "image" },
 
   // ── PDF ──────────────────────────────────────────────────────────────────
   { name: "PDF to Text",              url: "/pdf/pdf-to-text",                 icon: "📄", category: "pdf" },

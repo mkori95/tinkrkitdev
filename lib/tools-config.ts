@@ -395,6 +395,39 @@ export const TOOLS: Tool[] = [
     description: "Convert SVG files to JPEG format with quality control",
     keywords: ["svg to jpeg", "svg to jpg", "convert svg to jpeg", "svg jpeg converter"],
   },
+  {
+    name: "HEIC to JPG",
+    slug: "heic-to-jpg",
+    category: "image",
+    url: "/image/heic-to-jpg",
+    description: "Convert iPhone HEIC photos to JPG format online — no upload needed",
+    keywords: ["heic to jpg", "convert heic to jpg", "heic jpg converter", "iphone photo to jpg", "heic to jpeg", "heif to jpg"],
+    popular: true,
+  },
+  {
+    name: "HEIC to PNG",
+    slug: "heic-to-png",
+    category: "image",
+    url: "/image/heic-to-png",
+    description: "Convert HEIC photos to PNG format online, free and private",
+    keywords: ["heic to png", "convert heic to png", "heic png converter", "heif to png", "iphone photo to png"],
+  },
+  {
+    name: "JPG to HEIC",
+    slug: "jpg-to-heic",
+    category: "image",
+    url: "/image/jpg-to-heic",
+    description: "Convert JPG images to HEIC format — Apple Safari supported",
+    keywords: ["jpg to heic", "convert jpg to heic", "jpeg to heic", "jpg to heif", "jpeg to heif"],
+  },
+  {
+    name: "PNG to HEIC",
+    slug: "png-to-heic",
+    category: "image",
+    url: "/image/png-to-heic",
+    description: "Convert PNG images to HEIC format — Apple Safari supported",
+    keywords: ["png to heic", "convert png to heic", "png to heif", "png heic converter"],
+  },
 
   // ─── PDF ──────────────────────────────────────────────────────────────────
   {
