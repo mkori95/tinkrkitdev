@@ -5,6 +5,7 @@ import { supabase } from "@/lib/supabase";
 import type { UnifiedPost } from "@/lib/supabase";
 import { BlogListing } from "@/components/BlogListing";
 import type { Metadata } from "next";
+import { unstable_noStore as noStore } from "next/cache";
 
 export const metadata: Metadata = {
   title: "Blog — tinkrkit.dev",
@@ -16,6 +17,8 @@ export const metadata: Metadata = {
 export const dynamic = "force-dynamic";
 
 export default async function BlogPage() {
+  // Explicitly opt out of Next.js data cache for the Supabase singleton client
+  noStore();
   // ── MDX posts (from /content/blog/*.mdx) ────────────────────────────────
   const mdxPosts: UnifiedPost[] = getAllPosts().map((p) => ({
     slug:        p.slug,
